@@ -3,7 +3,9 @@ import {
   getEmailVerification,
   getLoginEmailVerification,
   postJoin,
+  postKakaoLogin,
   postLogin,
+  postLogout,
   refreshToken,
   removeToken,
   tokenInspect,
@@ -18,4 +20,6 @@ globalRouter.route("/token-inspect").get(tokenInspect);
 globalRouter.route("/refresh-token").get(refreshToken);
 globalRouter.route("/remove-token").get(removeToken);
 globalRouter.route("/login").post(postLogin);
+globalRouter.route("/kakao-login").post(postKakaoLogin);
+globalRouter.route("/logout").post(postLogout);
 export default globalRouter;

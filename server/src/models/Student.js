@@ -11,9 +11,9 @@ const studentSchema = new mongoose.Schema({
   socialOnly: { type: Boolean, default: false },
   profileImg: { type: String, default: null },
   joinState: {
-    approve: { type: Boolean, default: false, required: true },
-    token: { type: String, default: null, required: true },
-    expires: { type: Date, required: true },
+    approve: { type: Boolean, default: false },
+    token: { type: String, default: null },
+    expires: { type: Date },
   },
   listenLecture: [{ type: mongoose.Schema.Types.ObjectId, ref: "Lecture" }],
 });

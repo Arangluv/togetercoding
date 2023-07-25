@@ -4,6 +4,7 @@ import Student from "../models/Student";
 import { accessTokenConfig, refreshTokenConfig } from "../config/jwtConfig";
 import jwt from "jsonwebtoken";
 import { cookiesConfig } from "../config/cookieConfig";
+import axios from "axios";
 const generateEmailVerificationToken = () => {
   const token = crypto.randomBytes(20).toString("hex");
   const expires = new Date();
@@ -144,11 +145,10 @@ export const tokenInspect = async (req, res) => {
   } catch (error) {
     // error.name -> 만료시 에러이름 : TokenExpiredError, 유효하지 않은 토큰 : JsonWebTokenError
     if (error.name === "TokenExpiredError") {
-      console.log("토큰만료 ?");
       // 토큰 만료 시
       return res.status(404).json({ errorCode: 1 }); // TODO clearCookie
     }
-    console.log("invaild token ?");
+
     return res
       .cookie("token", { maxAge: 0 })
       .status(404)
@@ -181,6 +181,7 @@ export const refreshToken = async (req, res) => {
       });
   } catch (error) {
     // refresh token마저도 invalid한 경우 처리 -> 다시 로그인 -> ####이거 수정해야함###
+    console.log(error);
     return res
       .cookie("token", { maxAge: 0 })
       .status(404)
@@ -218,7 +219,7 @@ export const postLogin = async (req, res) => {
     student.joinState.token = token;
     student.joinState.expires = expires;
     await student.save();
-    
+
     const mailOptions = {
       from: "ruhunsu3@naver.com", // 발송 주체
       to: "ruhunsu3@naver.com", // 인증을 요청한 이메일 주소
@@ -277,4 +278,105 @@ export const getLoginEmailVerification = async (req, res) => {
     console.log(error);
     return res.status(404).json({ message: "잘못된 접근입니다" });
   }
+};
+const getKakaoToken = async (token) => {
+  const url = "https://kauth.kakao.com/oauth/token";
+  const params = {
+    grant_type: "authorization_code",
+    client_id: process.env.KAKAO_API,
+    redirect_uri: "http://localhost:3000/kakao-login",
+    code: token,
+  };
+  try {
+    const response = await axios.post(url, null, {
+      params,
+      headers: {
+        "content-type": "application/x-www-form-urlencoded;charset=utf-8",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw new Error("카카오 로그인에서 토큰을 받아오는데 실패했습니다");
+  }
+};
+const getKakaoInfo = async (token) => {
+  const url = "https://kapi.kakao.com/v2/user/me";
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  try {
+    const response = await axios.get(url, config);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw new Error("사용자 정보를 받아오는데 문제가 발생했습니다");
+  }
+};
+export const postKakaoLogin = async (req, res) => {
+  const { loginToken } = req.body;
+  try {
+    const { access_token } = await getKakaoToken(loginToken);
+    const { id, kakao_account } = await getKakaoInfo(access_token);
+    const { nickname, profile_image_url } = kakao_account.profile;
+    const { email } = kakao_account;
+    const student = await Student.findOne({ email: kakao_account.email });
+    const { acceessSecretKey, accessOptions } = accessTokenConfig;
+    const { refreshSecretKey, refreshOptions } = refreshTokenConfig;
+
+    const cookieConfig = cookiesConfig();
+    if (!student) {
+      //회원가입을 진행
+      const student = await Student.create({
+        name: nickname,
+        nickname: `${nickname}_${id}`,
+        email,
+        profileImg: profile_image_url,
+        socialOnly: true,
+        joinState: {
+          approve: true,
+          token: null,
+        },
+      });
+      const payload = {
+        id: student._id,
+      };
+      const accessToken = jwt.sign(payload, acceessSecretKey, accessOptions);
+      const refreshToken = jwt.sign(payload, refreshSecretKey, refreshOptions);
+      const cookieConfig = cookiesConfig();
+      return res
+        .cookie("token", { accessToken, refreshToken }, { ...cookieConfig })
+        .status(200)
+        .json({
+          name: student.name,
+          nickname: student.nickname,
+          profileImg: student.profileImg,
+          email: student.email,
+        });
+    }
+    const payload = {
+      id: student._id,
+    };
+    const accessToken = jwt.sign(payload, acceessSecretKey, accessOptions);
+    const refreshToken = jwt.sign(payload, refreshSecretKey, refreshOptions);
+    return res
+      .status(200)
+      .cookie("token", { accessToken, refreshToken }, { ...cookieConfig })
+      .json({
+        name: student.name,
+        nickname: student.nickname,
+        profileImg: student.profileImg,
+        email: student.email,
+      });
+  } catch (error) {
+    console.log("에러가 발생했구나");
+    console.log(error);
+  }
+};
+
+export const postLogout = (req, res) => {
+  console.log("로그아웃 안눌림?");
+  return res.clearCookie("token").status(200).send();
 };
