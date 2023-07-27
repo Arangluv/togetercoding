@@ -4,6 +4,9 @@ import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import globalRouter from "./routers/globalRouter";
+import studentRouter from "./routers/studentRouter";
+import adminRouter from "./routers/adminRouter";
+import lectureRouter from "./routers/lectureRouter";
 
 const app = express();
 // app.use(morgan("combined"));
@@ -20,7 +23,9 @@ app.use(helmet());
 
 // router
 app.use("/", globalRouter);
-
+app.use("/students", studentRouter);
+app.use("/admin", adminRouter);
+app.use("/lectures", lectureRouter);
 // bad path
 app.use((req, res, next) => {
   res.status(404).send("Not found");

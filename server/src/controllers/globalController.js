@@ -169,7 +169,6 @@ export const refreshToken = async (req, res) => {
     const accessToken = jwt.sign(payload, acceessSecretKey, accessOptions);
     const cookieConfig = cookiesConfig();
     const student = await Student.findById(id);
-
     return res
       .status(200)
       .cookie("token", { accessToken, refreshToken }, { ...cookieConfig })
