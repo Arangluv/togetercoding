@@ -1,7 +1,9 @@
 import express from "express";
 import {
   getAllLecture,
+  getMainLecture,
   postMakeLecture,
+  postMakeMainTheme,
 } from "../controllers/lectureController";
 import AWS from "aws-sdk";
 import multer from "multer";
@@ -29,4 +31,6 @@ lectureRouter.route("/all-lecture").get(getAllLecture);
 lectureRouter
   .route("/make-lecture")
   .post(imageUploader.single("lecture-thumbnail"), postMakeLecture);
+lectureRouter.route("/main-lectures").get(getMainLecture);
+lectureRouter.route("/main-theme").post(postMakeMainTheme);
 export default lectureRouter;
