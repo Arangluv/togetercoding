@@ -10,7 +10,8 @@ const subLectureSchema = new mongoose.Schema({
       createdAT: { type: Date, default: Date.now() },
     },
   ],
-  notice: { type: String },
+  notice: { type: String, default: null },
+  githubUrl: { type: String, default: null },
   issue: [
     {
       id: { type: mongoose.Schema.Types.ObjectId, ref: "Student" },

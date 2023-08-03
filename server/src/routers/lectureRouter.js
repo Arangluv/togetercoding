@@ -1,9 +1,11 @@
 import express from "express";
 import {
+  deleteMainTheme,
   getAllLecture,
   getMainLecture,
   postMakeLecture,
   postMakeMainTheme,
+  postMakeSubTheme,
 } from "../controllers/lectureController";
 import AWS from "aws-sdk";
 import multer from "multer";
@@ -27,10 +29,28 @@ const imageUploader = multer({
     acl: "public-read-write",
   }),
 });
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+const localUpload = multer({ storage: storage });
+
 lectureRouter.route("/all-lecture").get(getAllLecture);
 lectureRouter
   .route("/make-lecture")
   .post(imageUploader.single("lecture-thumbnail"), postMakeLecture);
 lectureRouter.route("/main-lectures").get(getMainLecture);
 lectureRouter.route("/main-theme").post(postMakeMainTheme);
+lectureRouter.route("/sub-theme").post(
+  localUpload.single("lectureVideo"),
+  // imageUploader.single("lectureVideo"),
+  postMakeSubTheme
+);
+lectureRouter.route("/delete-maintheme").delete(deleteMainTheme);
 export default lectureRouter;
