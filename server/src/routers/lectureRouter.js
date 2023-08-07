@@ -3,6 +3,7 @@ import {
   deleteMainTheme,
   getAllLecture,
   getMainLecture,
+  getSubLecture,
   postMakeLecture,
   postMakeMainTheme,
   postMakeSubTheme,
@@ -53,4 +54,5 @@ lectureRouter.route("/sub-theme").post(
   postMakeSubTheme
 );
 lectureRouter.route("/delete-maintheme").delete(deleteMainTheme);
+lectureRouter.route("/sub-lectures").get(getSubLecture);
 export default lectureRouter;

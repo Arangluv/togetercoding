@@ -283,3 +283,27 @@ export const deleteMainTheme = async (req, res) => {
       .json({ message: "main theme을 삭제하는데 실패했습니다" });
   }
 };
+
+export const getSubLecture = async (req, res) => {
+  console.log("req.query");
+  console.log(req.query);
+  const { subLectureId } = req.query;
+  try {
+    const subLecture = await SubLecture.findById(subLectureId);
+    if (!subLecture) {
+      throw new Error("Sub Lecture를 불러오는데 오류가 발생했습니다");
+    }
+    console.log("subLecture");
+    console.log(subLecture);
+    return res
+      .status(200)
+      .json({
+        name: subLecture.name,
+        githubUrl: subLecture.githubUrl,
+        lectureLink: subLecture.lectureLink,
+        notice: subLecture.notice,
+      });
+  } catch (error) {
+    return res.status(404).json({ message: error.message });
+  }
+};
