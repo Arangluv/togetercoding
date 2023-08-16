@@ -1,6 +1,7 @@
 import express from "express";
 import {
   deleteMainTheme,
+  deleteSubLecture,
   getAllLecture,
   getMainLecture,
   getSubLecture,
@@ -55,4 +56,5 @@ lectureRouter.route("/sub-theme").post(
 );
 lectureRouter.route("/delete-maintheme").delete(deleteMainTheme);
 lectureRouter.route("/sub-lectures").get(getSubLecture);
+lectureRouter.route("/delete-sub-lecture").delete(deleteSubLecture);
 export default lectureRouter;

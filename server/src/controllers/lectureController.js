@@ -11,9 +11,13 @@ AWS.config.update({
 });
 const s3 = new AWS.S3();
 
-const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffmpeg = require("fluent-ffmpeg");
-ffmpeg.setFfmpegPath(ffmpegPath);
+const ffmpegInstaller = require("@ffmpeg-installer/ffmpeg");
+ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+
+console.log("ffmpegInstaller.path");
+console.log(ffmpegInstaller.path, ffmpegInstaller.version);
+
 export const getAllLecture = async (req, res) => {
   try {
     const lecture = await Lecture.find({});
@@ -48,8 +52,6 @@ export const getMainLecture = async (req, res) => {
         path: "subLecture",
       },
     });
-    console.log("lecture");
-    console.log(lecture);
     return res.status(200).json({ lecture: lecture.lecture });
   } catch (error) {
     res.status(404).json({ message: "강의를 찾는데 실패했습니다" });
@@ -78,24 +80,48 @@ export const postMakeSubTheme = async (req, res) => {
   // console.log("req.files");
   // console.log(req.files);
   try {
-    const filePath = req.file.path;
-    const fileName = req.file.filename;
-    const { subLectureName, subLectureId, githubUrl, notice, mainLectureId } =
-      req.body;
-    console.log("subLectureId");
-    console.log(subLectureId === "" ? "비었음" : subLectureId);
-    console.log("mainLectureId");
-    console.log(mainLectureId === "" ? "비었음" : mainLectureId);
-    console.log("subLectureName");
-    console.log(subLectureName);
-    console.log("githubUrl");
-    console.log(githubUrl); // 없으면 undefinesd
-    console.log("notice");
-    console.log(notice); // 없으면 undefined
+    const file = req?.file;
+    const filePath = req.file?.path;
+    const fileName = req.file?.filename;
+    console.log("파일 ?");
+    console.log(file);
+    const {
+      subLectureName,
+      subLectureId,
+      githubUrl,
+      notice,
+      mainLectureId,
+      lectureLink,
+    } = req.body;
+    // console.log("filePath ?");
+    // console.log(filePath);
+    // console.log("fileName ?");
+    // console.log(fileName);
+    // console.log("subLectureId");
+    // console.log(subLectureId === "" ? "비었음" : subLectureId);
+    // console.log("mainLectureId");
+    // console.log(mainLectureId === "" ? "비었음" : mainLectureId);
+    // console.log("subLectureName");
+    // console.log(subLectureName);
+    // console.log("githubUrl");
+    // console.log(githubUrl); // 없으면 undefinesd
+    // console.log("notice");
+    // console.log(notice); // 없으면 undefined
+    // console.log("lectureLink");
+    // console.log(lectureLink);
 
     if (subLectureId) {
       // 이미있는 Lecture를 수정하는 경우
-      await editSubTheme();
+      // 파일이 없는 경우 -> req.file === undefined
+      await editSubTheme({
+        file: req.file,
+        subLectureId,
+        mainLectureId,
+        subLectureName,
+        githubUrl,
+        notice,
+        lectureLink,
+      });
       return res.status(200).json({ message: "sub lecture를 수정했습니다" });
     }
     await makeNewSubTheme({
@@ -112,7 +138,6 @@ export const postMakeSubTheme = async (req, res) => {
       .json({ message: "새로운 sub lecture를 만들었습니다" });
   } catch (error) {
     // #4
-    console.log("post 오류?");
     console.log(error);
     return res
       .status(404)
@@ -129,10 +154,9 @@ const makeNewSubTheme = async ({
   mainLectureId,
 }) => {
   try {
-    const location = await videoEncode(filePath, fileName);
+    const location = await videoEncode(filePath, fileName); // return encode video m3u8 location
+    // const location = videoEncode(filePath, fileName);
     // #2
-    console.log("location");
-    console.log(location);
     const subLecture = await SubLecture.create({
       name: subLectureName,
       lectureLink: location,
@@ -159,27 +183,84 @@ const makeNewSubTheme = async ({
 };
 
 // 이미 있는 subTheme을 수정하는 경우
-const editSubTheme = async () => {
-  return null;
-};
+const editSubTheme = async ({
+  file,
+  subLectureId,
+  subLectureName,
+  githubUrl,
+  notice,
+  lectureLink,
+}) => {
+  // 수정할 파일이 있는 경우
+  if (file) {
+    try {
+      const filePath = file.path;
+      const fileName = file.filename;
+      const location = await videoEncode(filePath, fileName);
+      await SubLecture.findByIdAndUpdate(subLectureId, {
+        name: subLectureName,
+        githubUrl,
+        notice,
+        lectureLink: location,
+      });
+      const bucketName = "togethercoding";
+      const folderPrefix = `lectures/${lectureLink.split("/")[4]}/`;
+      // List objects within the folder
+      s3.listObjects(
+        { Bucket: bucketName, Prefix: folderPrefix },
+        (err, data) => {
+          if (err) {
+            console.error("Error listing objects:", err);
+            return;
+          }
 
+          // Delete each object
+          const objectsToDelete = data.Contents.map((obj) => ({
+            Key: obj.Key,
+          }));
+          s3.deleteObjects(
+            { Bucket: bucketName, Delete: { Objects: objectsToDelete } },
+            (err, data) => {
+              if (err) {
+                console.error("Error deleting objects:", err);
+              } else {
+                console.log("Objects deleted:", data.Deleted);
+              }
+            }
+          );
+        }
+      );
+      return;
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
+  }
+  await SubLecture.findByIdAndUpdate(subLectureId, {
+    name: subLectureName,
+    githubUrl,
+    notice,
+  });
+  // 수정할 파일이 없는 경우
+  return;
+};
 const videoEncode = (filePath, fileName) => {
   let location = null;
   return new Promise((resolve, reject) => {
     ffmpeg(filePath)
-      .addOption([
-        "-profile:v baseline",
-        "-level 3.0",
-        "-start_number 0",
-        "-hls_time 10",
-        "-hls_list_size 0",
-        "-f hls",
-      ])
-      .output(`videoEncodeOutput/${fileName}.m3u8`)
-      .on("end", () => {
+      .addOption("-profile:v", "baseline")
+      .addOption("-strict", "-2")
+      .addOption("-level", "3.0")
+      .addOption("-start_number", "0")
+      .addOption("-hls_time", "10")
+      .addOption("-hls_list_size", "0")
+      .addOption("-f", "hls")
+      .output(`videoEncodeOutput/${fileName.split(".")[0]}.m3u8`)
+      .on("end", async () => {
         // 업로드된 ts파일을 s3에 업로드 후
         // encode된 파일을 읽는다 (비동기)
         // 여기서 원본 mp4를 지우고 -> fs.unlink 비동기
+
         fs.unlink(
           `/Users/hyunsoo/Desktop/my/moneycoding/server/uploads/${fileName}`,
           (err) => {
@@ -188,17 +269,13 @@ const videoEncode = (filePath, fileName) => {
             console.log("원본 mp4 파일 삭제");
           }
         );
-        location = readFolder();
+
+        location = await readFolder();
         // 기존 파일을 삭제햐야함 #5
-        console.log("end");
-        console.log("내부 location");
-        console.log(location);
         return resolve(location);
       })
       .run();
   });
-
-  // #1
 };
 
 const readFolder = () => {
@@ -220,28 +297,30 @@ const readFolder = () => {
                 "/Users/hyunsoo/Desktop/my/moneycoding/server/videoEncodeOutput/" +
                   filename
               );
-              const file = fs.readFileSync(directory, "utf8");
+
+              // 이게 문제였음 const file = fs.readFileSync(directory, "utf8");
               // s3에 파일을 업로드 한다
               s3.upload(
                 {
                   Bucket: "togethercoding",
-                  Key: `lectures/${filename}`, // 저장할 경로
-                  Body: file,
+                  Key: `lectures/${filename.split("-")[0]}/${filename}`, // 저장할 경로
+                  Body: fs.createReadStream("videoEncodeOutput/" + filename),
+                  ContentType: "multipart/form-data",
                 },
                 (s3Err, data) => {
                   if (s3Err) {
                     console.error("Error uploading:", s3Err);
                   } else {
-                    console.log("File uploaded successfully:");
                     // data.key : test/1690959575920-sample-mp4-file.mp48.ts
-                    const deleteEncodeFileName = data.key.split("/")[1];
-                    if (data.key.split(".")[2] === "m3u8") {
-                      console.log("location을 담았습니다");
+                    console.log("data key?");
+                    console.log(data.key);
+                    const deleteEncodeFileName = data.key.split("/")[2];
+
+                    if (data.key.split(".")[1] === "m3u8") {
                       location = data.Location;
-                      console.log("s3 안에서 location ?");
-                      console.log(location);
                       resolve(location);
                     }
+
                     fs.unlink(
                       `/Users/hyunsoo/Desktop/my/moneycoding/server/videoEncodeOutput/${deleteEncodeFileName}`,
                       (err) => {
@@ -250,7 +329,7 @@ const readFolder = () => {
                         console.log("Encode ts, m3u8 파일 삭제");
                       }
                     );
-                    // 여기서 encode된 파일을 지운다
+                    resolve();
                   }
                 }
               );
@@ -261,6 +340,102 @@ const readFolder = () => {
     );
   });
 };
+// const videoEncode = (filePath, fileName) => {
+//   let location = null;
+//   return new Promise((resolve, reject) => {
+//     ffmpeg(filePath)
+//       .addOption("-profile:v", "baseline")
+//       .addOption("-strict", "-2")
+//       .addOption("-level", "3.0")
+//       .addOption("-start_number", "0")
+//       .addOption("-hls_time", "10")
+//       .addOption("-hls_list_size", "0")
+//       .addOption("-f", "hls")
+//       .output(`videoEncodeOutput/${fileName.split(".")[0]}.m3u8`)
+//       .on("end", () => {
+//         // 업로드된 ts파일을 s3에 업로드 후
+//         // encode된 파일을 읽는다 (비동기)
+//         // 여기서 원본 mp4를 지우고 -> fs.unlink 비동기
+
+//         fs.unlink(
+//           `/Users/hyunsoo/Desktop/my/moneycoding/server/uploads/${fileName}`,
+//           (err) => {
+//             if (err) return reject(new Error(err));
+
+//             console.log("원본 mp4 파일 삭제");
+//           }
+//         );
+
+//         location = readFolder();
+//         // 기존 파일을 삭제햐야함 #5
+//         return resolve(location);
+//       })
+//       .run();
+//   });
+// };
+
+// const readFolder = () => {
+//   let location = null;
+//   return new Promise((resolve, reject) => {
+//     fs.readdir(
+//       path.join(
+//         "/Users/hyunsoo/Desktop/my/moneycoding/server/videoEncodeOutput/"
+//       ),
+//       "utf8",
+//       (err, files) => {
+//         if (err) {
+//           reject(new Error(err));
+//         }
+//         Promise.all(
+//           files.map((filename) => {
+//             if (filename !== ".DS_Store") {
+//               const directory = path.join(
+//                 "/Users/hyunsoo/Desktop/my/moneycoding/server/videoEncodeOutput/" +
+//                   filename
+//               );
+//               const file = fs.readFileSync(directory, "utf8");
+//               // s3에 파일을 업로드 한다
+//               s3.upload(
+//                 {
+//                   Bucket: "togethercoding",
+//                   Key: `lectures/${filename}`, // 저장할 경로
+//                   Body: file,
+//                   ContentType: "multipart/form-data",
+//                 },
+//                 (s3Err, data) => {
+//                   if (s3Err) {
+//                     console.error("Error uploading:", s3Err);
+//                   } else {
+//                     console.log("File uploaded successfully:");
+//                     console.log("업로드 성공 시 데이터");
+//                     console.log(data);
+//                     // data.key : test/1690959575920-sample-mp4-file.mp48.ts
+//                     const deleteEncodeFileName = data.key.split("/")[1];
+
+//                     if (data.key.split(".")[1] === "m3u8") {
+//                       console.log("location을 담았습니다");
+//                       location = data.Location;
+//                       resolve(location);
+//                     }
+
+//                     fs.unlink(
+//                       `/Users/hyunsoo/Desktop/my/moneycoding/server/videoEncodeOutput/${deleteEncodeFileName}`,
+//                       (err) => {
+//                         if (err) return reject(new Error(err));
+
+//                         console.log("Encode ts, m3u8 파일 삭제");
+//                       }
+//                     );
+//                   }
+//                 }
+//               );
+//             }
+//           })
+//         );
+//       }
+//     );
+//   });
+// };
 
 export const deleteMainTheme = async (req, res) => {
   const { lectureId, mainLectureId } = req.body;
@@ -295,15 +470,70 @@ export const getSubLecture = async (req, res) => {
     }
     console.log("subLecture");
     console.log(subLecture);
-    return res
-      .status(200)
-      .json({
-        name: subLecture.name,
-        githubUrl: subLecture.githubUrl,
-        lectureLink: subLecture.lectureLink,
-        notice: subLecture.notice,
-      });
+    return res.status(200).json({
+      name: subLecture.name,
+      githubUrl: subLecture.githubUrl,
+      lectureLink: subLecture.lectureLink,
+      notice: subLecture.notice,
+    });
   } catch (error) {
     return res.status(404).json({ message: error.message });
+  }
+};
+
+export const deleteSubLecture = async (req, res) => {
+  const { subLectureId, mainLectureId } = req.body;
+  // 비디오 삭제 ->
+  // mainTheme 배열에서 제거
+  // subLecture 삭제
+  console.log(subLectureId);
+  console.log("mainLectureId");
+  console.log(mainLectureId);
+  try {
+    const subLecture = await SubLecture.findById(subLectureId);
+    const lectureLinkNumber = subLecture.lectureLink.split("/")[4];
+    // 비디오 삭제 Part
+
+    const bucketName = "togethercoding";
+    const folderPrefix = `lectures/${lectureLinkNumber}/`;
+    // List objects within the folder
+    s3.listObjects(
+      { Bucket: bucketName, Prefix: folderPrefix },
+      (err, data) => {
+        if (err) {
+          console.error("Error listing objects:", err);
+          return;
+        }
+
+        // Delete each object
+        const objectsToDelete = data.Contents.map((obj) => ({
+          Key: obj.Key,
+        }));
+        s3.deleteObjects(
+          { Bucket: bucketName, Delete: { Objects: objectsToDelete } },
+          (err, data) => {
+            if (err) {
+              console.error("Error deleting objects:", err);
+            } else {
+              console.log("Objects deleted:", data.Deleted);
+            }
+          }
+        );
+      }
+    );
+
+    await LectureMainTheme.updateOne(
+      { _id: mainLectureId },
+      {
+        $pull: {
+          subLecture: subLectureId,
+        },
+      }
+    );
+
+    await SubLecture.deleteOne({ _id: subLectureId });
+    return res.status(200).json({ message: "성공적으로 삭제했습니다" });
+  } catch (error) {
+    return res.status(404).json({ message: "삭제하는데 실패했습니다." });
   }
 };

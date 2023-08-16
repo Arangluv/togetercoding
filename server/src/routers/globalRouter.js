@@ -14,12 +14,12 @@ import {
 const globalRouter = express.Router();
 
 globalRouter.route("/join").post(postJoin);
+globalRouter.route("/login").post(postLogin);
 globalRouter.route("/email-varification").get(getEmailVerification);
 globalRouter.route("/email-login-varification").get(getLoginEmailVerification);
 globalRouter.route("/token-inspect").get(tokenInspect);
 globalRouter.route("/refresh-token").get(refreshToken);
 globalRouter.route("/remove-token").get(removeToken);
-globalRouter.route("/login").post(postLogin);
 globalRouter.route("/kakao-login").post(postKakaoLogin);
 globalRouter.route("/logout").post(postLogout);
 export default globalRouter;

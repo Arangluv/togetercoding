@@ -16,6 +16,7 @@ const studentSchema = new mongoose.Schema({
     expires: { type: Date },
   },
   listenLecture: [{ type: mongoose.Schema.Types.ObjectId, ref: "Lecture" }],
+  session: { type: String, default: "" },
 });
 
 studentSchema.pre("save", async function () {
