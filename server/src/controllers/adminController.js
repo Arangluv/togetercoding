@@ -6,10 +6,11 @@ import AWS from "aws-sdk";
 
 export const tokenCheck = async (req, res) => {
   try {
-    const accessToken = req.headers.authorization.split(" ")[1];
-    const { acceessSecretKey } = accessTokenConfig;
-    const adminInfo = await jwt.verify(accessToken, acceessSecretKey);
-    const { id } = adminInfo;
+    if (!req.session) {
+      return res.status(404).send();
+    }
+    const id = req.session.user.id;
+    const sessionId = req.session.id;
     const student = await Student.findById(id);
     console.log("student");
     console.log(student);
@@ -18,18 +19,35 @@ export const tokenCheck = async (req, res) => {
       student.nickname === process.env.ADMIN_NICKNAME &&
       student.email === process.env.ADMIN_EMAIL
     ) {
-      console.log("여기가 실행되어야함");
       return res.status(200).json({ code: process.env.ADMIN_CODE });
     }
     // admin이 아닌 다른 유저가 패널에 접속
     // 심각한 문제
-    return res.clearCookie("token").status(404).json({ errorCode: -1 });
+    req.session.destroy((err) => {
+      if (err) {
+        console.log(err);
+        throw new Error("???");
+      }
+
+      const store = new MongoStore({
+        mongoUrl: "mongodb://127.0.0.1:27017/togethercoding",
+      });
+      store.destroy(sessionId, (err) => {
+        if (err) {
+          console.error("Error destroying session in MongoDB:", err);
+        }
+      });
+      return res
+        .clearCookie("connect.sid")
+        .status(200)
+        .json({ message: "로그아웃했습니다" });
+    });
   } catch (error) {
     if (error.name === "TokenExpiredError") {
       // 토큰 만료 시
       return res.status(404).json({ errorCode: 1 }); // TODO clearCookie
     }
-    return res.clearCookie("token").status(404).json({ errorCode: -1 }); // 유효하지 않은 토큰, TODO clearCookie
+    return res.clearCookie("connect.sid").status(404).json({ errorCode: -1 }); // 유효하지 않은 토큰, TODO clearCookie
   }
 };
 

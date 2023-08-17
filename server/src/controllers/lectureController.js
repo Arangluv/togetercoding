@@ -28,15 +28,26 @@ export const getAllLecture = async (req, res) => {
 };
 
 export const postMakeLecture = async (req, res) => {
-  const { name } = req.body;
+  console.log(req.body);
+  const { name, subName, urlName, description, lectureTag } = req.body;
   const { location } = req.file;
   try {
+    const tagArr = lectureTag
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter((trimedTag) => trimedTag !== "");
+
     await Lecture.create({
       name,
+      subName,
+      urlName,
+      description,
+      lectureTag: tagArr,
       thumbnail: location,
     });
-    return res.status(200).json({ message: "일단 성공으로 res" });
+    return res.status(200).json({ message: "강의를 만들었습니다" });
   } catch (error) {
+    console.log(error);
     return res
       .status(404)
       .json({ message: "강의를 만드는데 문제가 발생했습니다" });

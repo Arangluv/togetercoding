@@ -55,14 +55,17 @@ export const postJoin = async (req, res) => {
             message: `이메일을 보내는데 실패했습니다`,
           });
         } else {
-          return res.status(200).json({
-            message: `Authentication mail is sent to ${email}`,
-          });
+          console.log("메일을 보내는데 성공했습니다");
+          return;
         }
         smtpTransport.close();
         return res.status(500).send();
       });
+      return res.status(200).json({
+        message: `Authentication mail is sent to ${email}`,
+      });
     }
+
     // 이메일이 존재하지않는 신규유저
     // Create Student with not yet approve join
     await Student.create({
@@ -108,21 +111,26 @@ export const getEmailVerification = async (req, res) => {
       student.joinState.token === token &&
       student.joinState.expires > nowDate
     ) {
-      student.joinState.approve = true;
-      await student.save();
-      const { acceessSecretKey, accessOptions } = accessTokenConfig;
-      const { refreshSecretKey, refreshOptions } = refreshTokenConfig;
-      const payload = {
-        id: student._id,
-      };
-      const accessToken = jwt.sign(payload, acceessSecretKey, accessOptions);
-      const refreshToken = jwt.sign(payload, refreshSecretKey, refreshOptions);
-      const cookieConfig = cookiesConfig();
-      return res
-        .cookie("token", { accessToken, refreshToken }, { ...cookieConfig })
-        .status(200)
-        .redirect("http://localhost:3000");
+      // 만료시간도 지켰고, query를 통해 보내준 토큰이 일치하면
+      // 원래는 accessToken을 발급
+      if (!req.session.user) {
+        req.session.user = {
+          id: student._id,
+          name: student.name,
+          authorized: true,
+        };
+        student.session = req.session.id;
+        await student.save();
+        req.session.save((err) => {
+          if (err) {
+            throw new Error();
+          }
+          res.status(200).redirect("http://localhost:3000");
+        });
+      }
+      return;
     }
+    console.log("redirect에서 문제 발생");
     return res.status(404).redirect("http://localhost:3000");
   } catch (error) {
     console.log(error);
@@ -132,22 +140,45 @@ export const getEmailVerification = async (req, res) => {
 
 export const tokenInspect = async (req, res) => {
   try {
-    console.log("req.session");
-    console.log(req?.session);
     if (!req.session) {
       return res.status(200).json({ message: "로그인 되어 있지 않습니다" });
     }
+    // req.session.user 에는 name과 id
     const student = await Student.findOne({
       _id: req.session.user.id,
       session: req.session.id,
     });
-    // const student = await Student.findById(id);
-    return res.status(200).json({
-      name: student.name,
-      nickname: student.nickname,
-      profileImg: student.profileImg,
-      email: student.email,
-    });
+
+    const sid = req.session.id; // session id
+    if (!student) {
+      req.session.destroy((err) => {
+        if (err) {
+          console.log(err);
+          throw new Error("???");
+        }
+
+        const store = new MongoStore({
+          mongoUrl: "mongodb://127.0.0.1:27017/togethercoding",
+        });
+        store.destroy(sid, (err) => {
+          if (err) {
+            console.error("Error destroying session in MongoDB:", err);
+          }
+        });
+      });
+
+      return res
+        .clearCookie("connect.sid")
+        .status(200)
+        .json({ message: "로그아웃했습니다" });
+    } else {
+      return res.status(200).json({
+        name: student.name,
+        nickname: student.nickname,
+        profileImg: student.profileImg,
+        email: student.email,
+      });
+    }
   } catch (error) {
     // error.name -> 만료시 에러이름 : TokenExpiredError, 유효하지 않은 토큰 : JsonWebTokenError
     return res.clearCookie("connect.sid").status(404).json({ errorCode: -1 }); // 유효하지 않은 토큰, TODO clearCookie
@@ -332,21 +363,6 @@ export const getLoginEmailVerification = async (req, res) => {
         });
       }
       return;
-      // res.session.destroy((err) => {
-      //   console.log(err);
-      // });
-      // const { acceessSecretKey, accessOptions } = accessTokenConfig;
-      // const { refreshSecretKey, refreshOptions } = refreshTokenConfig;
-      // const payload = {
-      //   id: student._id,
-      // };
-      // const accessToken = jwt.sign(payload, acceessSecretKey, accessOptions);
-      // const refreshToken = jwt.sign(payload, refreshSecretKey, refreshOptions);
-      // const cookieConfig = cookiesConfig();
-      // return res
-      //   .cookie("token", { accessToken, refreshToken }, { ...cookieConfig })
-      //   .status(200)
-      //   .redirect("http://localhost:3000");
     }
     console.log("redirect에서 문제 발생");
     return res.status(404).redirect("http://localhost:3000");
@@ -371,6 +387,18 @@ const getKakaoToken = async (token) => {
         "content-type": "application/x-www-form-urlencoded;charset=utf-8",
       },
     });
+    console.log("getKakaoToken에서 response data ?");
+    console.log(response.data);
+    // ex)
+
+    // {
+    //   access_token: 'tCx08EzX2A37vh3DnmLeFCLF0aRfhv1-eX8ZReF7CiolUAAAAYoCc9ps',
+    //   token_type: 'bearer',
+    //   refresh_token: 'jtrUYoKw9gNYmjTKyx33lVdscy9YfPfW15O-xD1iCiolUAAAAYoCc9pr',
+    //   expires_in: 21599,
+    //   scope: 'account_email profile_image profile_nickname',
+    //   refresh_token_expires_in: 5183999
+    // }
     return response.data;
   } catch (error) {
     console.log(error);
@@ -386,6 +414,34 @@ const getKakaoInfo = async (token) => {
   };
   try {
     const response = await axios.get(url, config);
+    console.log("getKakaoInfo에서 response data?");
+    console.log(response.data);
+    // ex)
+
+    // {
+    //   id: 2929886205,
+    //   connected_at: '2023-07-24T04:02:09Z',
+    //   properties: {
+    //     nickname: '류현수',
+    //     profile_image: 'http://k.kakaocdn.net/dn/CXyVh/btsooKzDcuh/Y8KzJcw7CDplOEdkSOmQik/img_640x640.jpg',
+    //     thumbnail_image: 'http://k.kakaocdn.net/dn/CXyVh/btsooKzDcuh/Y8KzJcw7CDplOEdkSOmQik/img_110x110.jpg'
+    //   },
+    //   kakao_account: {
+    //     profile_nickname_needs_agreement: false,
+    //     profile_image_needs_agreement: false,
+    //     profile: {
+    //       nickname: '류현수',
+    //       thumbnail_image_url: 'http://k.kakaocdn.net/dn/CXyVh/btsooKzDcuh/Y8KzJcw7CDplOEdkSOmQik/img_110x110.jpg',
+    //       profile_image_url: 'http://k.kakaocdn.net/dn/CXyVh/btsooKzDcuh/Y8KzJcw7CDplOEdkSOmQik/img_640x640.jpg',
+    //       is_default_image: false
+    //     },
+    //     has_email: true,
+    //     email_needs_agreement: false,
+    //     is_email_valid: true,
+    //     is_email_verified: true,
+    //     email: 'ruhunsu3@gmail.com'
+    //   }
+    // }
     return response.data;
   } catch (error) {
     console.error(error);
@@ -397,13 +453,10 @@ export const postKakaoLogin = async (req, res) => {
   try {
     const { access_token } = await getKakaoToken(loginToken);
     const { id, kakao_account } = await getKakaoInfo(access_token);
+
     const { nickname, profile_image_url } = kakao_account.profile;
     const { email } = kakao_account;
     const student = await Student.findOne({ email: kakao_account.email });
-    const { acceessSecretKey, accessOptions } = accessTokenConfig;
-    const { refreshSecretKey, refreshOptions } = refreshTokenConfig;
-
-    const cookieConfig = cookiesConfig();
     if (!student) {
       //회원가입을 진행
       const student = await Student.create({
@@ -417,36 +470,50 @@ export const postKakaoLogin = async (req, res) => {
           token: null,
         },
       });
-      const payload = {
-        id: student._id,
-      };
-      const accessToken = jwt.sign(payload, acceessSecretKey, accessOptions);
-      const refreshToken = jwt.sign(payload, refreshSecretKey, refreshOptions);
-      const cookieConfig = cookiesConfig();
-      return res
-        .cookie("token", { accessToken, refreshToken }, { ...cookieConfig })
-        .status(200)
-        .json({
+      if (!req.session.user) {
+        req.session.user = {
+          id: student._id,
           name: student.name,
-          nickname: student.nickname,
-          profileImg: student.profileImg,
-          email: student.email,
+          authorized: true,
+        };
+        student.session = req.session.id;
+        await student.save();
+        req.session.save((err) => {
+          if (err) {
+            throw new Error();
+          }
+          res.status(200).json({
+            name: student.name,
+            nickname: student.nickname,
+            profileImg: student.profileImg,
+            email: student.email,
+          });
         });
+      }
+      return;
     }
-    const payload = {
-      id: student._id,
-    };
-    const accessToken = jwt.sign(payload, acceessSecretKey, accessOptions);
-    const refreshToken = jwt.sign(payload, refreshSecretKey, refreshOptions);
-    return res
-      .status(200)
-      .cookie("token", { accessToken, refreshToken }, { ...cookieConfig })
-      .json({
+
+    if (!req.session.user) {
+      req.session.user = {
+        id: student._id,
         name: student.name,
-        nickname: student.nickname,
-        profileImg: student.profileImg,
-        email: student.email,
+        authorized: true,
+      };
+      student.session = req.session.id;
+      await student.save();
+      req.session.save((err) => {
+        if (err) {
+          throw new Error();
+        }
       });
+    }
+
+    return res.status(200).json({
+      name: student.name,
+      nickname: student.nickname,
+      profileImg: student.profileImg,
+      email: student.email,
+    });
   } catch (error) {
     console.log("에러가 발생했구나");
     console.log(error);
@@ -457,6 +524,7 @@ export const postLogout = async (req, res) => {
   try {
     if (req.session.user) {
       const logoutId = req.session.user.id;
+      const sessionId = req.session.id;
       const student = await Student.findById(logoutId);
       student.session = "";
       await student.save();
@@ -470,7 +538,7 @@ export const postLogout = async (req, res) => {
         const store = new MongoStore({
           mongoUrl: "mongodb://127.0.0.1:27017/togethercoding",
         });
-        store.destroy(logoutId, (err) => {
+        store.destroy(sessionId, (err) => {
           if (err) {
             console.error("Error destroying session in MongoDB:", err);
           }

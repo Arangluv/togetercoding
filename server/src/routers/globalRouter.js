@@ -10,12 +10,13 @@ import {
   removeToken,
   tokenInspect,
 } from "../controllers/globalController";
+import { notAllowLogined } from "../middleware/auth";
 
 const globalRouter = express.Router();
 
-globalRouter.route("/join").post(postJoin);
-globalRouter.route("/login").post(postLogin);
+globalRouter.route("/join").post(notAllowLogined, postJoin);
 globalRouter.route("/email-varification").get(getEmailVerification);
+globalRouter.route("/login").post(notAllowLogined, postLogin);
 globalRouter.route("/email-login-varification").get(getLoginEmailVerification);
 globalRouter.route("/token-inspect").get(tokenInspect);
 globalRouter.route("/refresh-token").get(refreshToken);
