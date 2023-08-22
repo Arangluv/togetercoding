@@ -2,7 +2,7 @@ import express from "express";
 import AWS from "aws-sdk";
 import multer from "multer";
 import multerS3 from "multer-s3";
-import { postChangeProfile } from "../controllers/studentController";
+import { postBuyLecture, postChangeProfile } from "../controllers/studentController";
 
 AWS.config.update({
   region: process.env.AWS_S3_REGION,
@@ -26,5 +26,7 @@ const studentRouter = express.Router();
 studentRouter
   .route("/change-profile")
   .post(imageUploader.single("profileImage"), postChangeProfile);
+
+studentRouter.route("/buy-lectures").post(postBuyLecture);
 
 export default studentRouter;

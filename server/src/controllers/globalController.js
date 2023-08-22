@@ -120,6 +120,7 @@ export const getEmailVerification = async (req, res) => {
           authorized: true,
         };
         student.session = req.session.id;
+        student.joinState.approve = true;
         await student.save();
         req.session.save((err) => {
           if (err) {

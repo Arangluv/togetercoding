@@ -1,8 +1,7 @@
 import Student from "../models/Student";
-import { accessTokenConfig, refreshTokenConfig } from "../config/jwtConfig";
-import jwt from "jsonwebtoken";
-import { cookiesConfig } from "../config/cookieConfig";
 import AWS from "aws-sdk";
+import Lecture from "../models/Lecture";
+import Purchase from "../models/Purchase";
 
 AWS.config.update({
   region: process.env.AWS_S3_REGION,
@@ -54,5 +53,51 @@ export const postChangeProfile = async (req, res) => {
     return res.status(400).json({
       message: "회원정보를 수정하는데 문제가 발생했습니다 " + error.name,
     });
+  }
+};
+
+export const postBuyLecture = async (req, res) => {
+  try {
+    if (!req.session) {
+      return res.status(404).send();
+    }
+    const { email, lectureId } = req.body;
+    console.log("email?");
+    console.log(email);
+    // req.session.user => user: { id: '64bf7bde52ce694ab1eef4a0', name: '류현수', authorized: true }
+    const buyer = await Student.findOne({
+      _id: req.session.user.id,
+      name: req.session.user.name,
+      email,
+    });
+    console.log("buyer");
+    console.log(buyer);
+    if (!buyer) {
+      return res.status(404).send();
+    }
+    const lecture = await Lecture.findOne({ _id: lectureId });
+    if (!lecture) {
+      return res.status(404).send();
+    }
+
+    const isAlreadyPurchased = await Purchase.exists({
+      buyer: buyer._id,
+      course: lecture._id,
+    });
+    if (isAlreadyPurchased) {
+      // 이미 구매했으므로 lecture page로 redirect 시켜주어야함
+      console.log("여기가 실행되어야함");
+      return res.status(200).redirect("http://localhost:3000/");
+    }
+    await Purchase.create({
+      buyer: buyer._id,
+      course: lecture._id,
+    });
+    return res.status(200).json({ message: "임시 성공~" });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(404)
+      .json({ message: "상품을 구매하는데 문제가 발생했습니다" });
   }
 };

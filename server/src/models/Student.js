@@ -15,7 +15,6 @@ const studentSchema = new mongoose.Schema({
     token: { type: String, default: null },
     expires: { type: Date },
   },
-  listenLecture: [{ type: mongoose.Schema.Types.ObjectId, ref: "Lecture" }],
   session: { type: String, default: "" },
 });
 

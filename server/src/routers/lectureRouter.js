@@ -3,6 +3,9 @@ import {
   deleteMainTheme,
   deleteSubLecture,
   getAllLecture,
+  getLectureList,
+  getLectureTitle,
+  getListenLecture,
   getMainLecture,
   getSubLecture,
   postMakeLecture,
@@ -57,4 +60,7 @@ lectureRouter.route("/sub-theme").post(
 lectureRouter.route("/delete-maintheme").delete(deleteMainTheme);
 lectureRouter.route("/sub-lectures").get(getSubLecture);
 lectureRouter.route("/delete-sub-lecture").delete(deleteSubLecture);
+lectureRouter.route("/listen-lectures").get(getListenLecture);
+lectureRouter.route("/lecture-title").get(getLectureTitle);
+lectureRouter.route("/lecture-list").get(getLectureList);
 export default lectureRouter;

@@ -1,6 +1,7 @@
 import Lecture from "../models/Lecture";
 import LectureMainTheme from "../models/LectureMainTheme";
 import SubLecture from "../models/SubLecture";
+import Purchase from "../models/Purchase";
 import AWS from "aws-sdk";
 import fs from "fs";
 import path from "path";
@@ -94,8 +95,6 @@ export const postMakeSubTheme = async (req, res) => {
     const file = req?.file;
     const filePath = req.file?.path;
     const fileName = req.file?.filename;
-    console.log("파일 ?");
-    console.log(file);
     const {
       subLectureName,
       subLectureId,
@@ -103,23 +102,8 @@ export const postMakeSubTheme = async (req, res) => {
       notice,
       mainLectureId,
       lectureLink,
+      lectureId,
     } = req.body;
-    // console.log("filePath ?");
-    // console.log(filePath);
-    // console.log("fileName ?");
-    // console.log(fileName);
-    // console.log("subLectureId");
-    // console.log(subLectureId === "" ? "비었음" : subLectureId);
-    // console.log("mainLectureId");
-    // console.log(mainLectureId === "" ? "비었음" : mainLectureId);
-    // console.log("subLectureName");
-    // console.log(subLectureName);
-    // console.log("githubUrl");
-    // console.log(githubUrl); // 없으면 undefinesd
-    // console.log("notice");
-    // console.log(notice); // 없으면 undefined
-    // console.log("lectureLink");
-    // console.log(lectureLink);
 
     if (subLectureId) {
       // 이미있는 Lecture를 수정하는 경우
@@ -142,6 +126,7 @@ export const postMakeSubTheme = async (req, res) => {
       githubUrl,
       notice,
       mainLectureId,
+      lectureId,
     });
 
     return res
@@ -163,6 +148,7 @@ const makeNewSubTheme = async ({
   githubUrl,
   notice,
   mainLectureId,
+  lectureId,
 }) => {
   try {
     const location = await videoEncode(filePath, fileName); // return encode video m3u8 location
@@ -184,6 +170,17 @@ const makeNewSubTheme = async ({
         },
       }
     );
+    const lecture = await Lecture.findById(lectureId);
+    lecture.totalLectureQuantity = lecture.totalLectureQuantity + 1;
+    await lecture.save();
+    // await Lecture.updateOne(
+    //   {
+    //     _id: lectureId,
+    //   },
+    //   {
+    //     totalLectureQuantity: this.totalLectureQuantity + 1,
+    //   }
+    // );
     return;
   } catch (error) {
     // #3
@@ -493,13 +490,10 @@ export const getSubLecture = async (req, res) => {
 };
 
 export const deleteSubLecture = async (req, res) => {
-  const { subLectureId, mainLectureId } = req.body;
+  const { subLectureId, mainLectureId, lectureId } = req.body;
   // 비디오 삭제 ->
   // mainTheme 배열에서 제거
   // subLecture 삭제
-  console.log(subLectureId);
-  console.log("mainLectureId");
-  console.log(mainLectureId);
   try {
     const subLecture = await SubLecture.findById(subLectureId);
     const lectureLinkNumber = subLecture.lectureLink.split("/")[4];
@@ -541,10 +535,76 @@ export const deleteSubLecture = async (req, res) => {
         },
       }
     );
+    const lecture = await Lecture.findById(lectureId);
+    lecture.totalLectureQuantity = lecture.totalLectureQuantity - 1;
+    await lecture.save();
 
     await SubLecture.deleteOne({ _id: subLectureId });
     return res.status(200).json({ message: "성공적으로 삭제했습니다" });
   } catch (error) {
     return res.status(404).json({ message: "삭제하는데 실패했습니다." });
+  }
+};
+
+export const getListenLecture = async (req, res) => {
+  try {
+    if (!req.session) {
+      return res.status(404).send();
+    }
+    const { id } = req.session.user;
+    const purchases = await Purchase.find({ buyer: id }).populate("course");
+    const listenLectures = purchases.map((item) => {
+      return {
+        id: item.course._id,
+        name: item.course.name,
+        thumbnail: item.course.thumbnail,
+        urlName: item.course.urlName,
+        totalLectureQuantity: item.course.totalLectureQuantity,
+        completeLectureQuantity: item.course.completeLectureQuantity,
+      };
+    });
+    return res.status(200).json({ listenLectures });
+  } catch (error) {
+    return res.status(404).json({ message: "bb" });
+  }
+};
+
+export const getLectureTitle = async (req, res) => {
+  try {
+    const { name: urlName } = req.query;
+    const lecture = await Lecture.findOne({ urlName });
+    if (!lecture) {
+      return res
+        .status(404)
+        .json({ message: "강의를 불러오는데 실패했습니다." });
+    }
+    const lectureTitleInfo = {
+      name: lecture.name,
+      totalLectureQuantity: lecture.totalLectureQuantity,
+      completeLectureQuantity: lecture.completeLectureQuantity,
+    };
+    return res.status(200).json({ lectureTitleInfo });
+  } catch (error) {
+    return res.status(404).json({ message: "강의를 불러오는데 실패했습니다." });
+  }
+};
+
+export const getLectureList = async (req, res) => {
+  try {
+    const { name: urlName } = req.query;
+    const { lecture } = await Lecture.findOne({ urlName }).populate({
+      path: "lecture",
+      populate: {
+        path: "subLecture",
+      },
+    });
+    // # CASE1 이렇게 populate된걸 한번에 다 줄지
+    // # CASE2 따로 refined 해야하는지
+
+    return res.status(200).json({ lectureList: lecture });
+  } catch (error) {
+    return res
+      .status(404)
+      .json({ message: "강의 리스트를 불러오는데 실패했습니다" });
   }
 };

@@ -15,9 +15,13 @@ const app = express();
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(express.json()); // if user post data, express json parsing
 app.use(express.urlencoded({ extended: true })); // HTML Form parsing
+app.use(helmet());
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3000", "http://localhost:3000/"],
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
     credentials: true,
   })
 );
@@ -41,7 +45,6 @@ app.use(
     },
   })
 );
-app.use(helmet());
 
 // router
 app.use("/", globalRouter);
