@@ -11,6 +11,7 @@ const subLectureSchema = new mongoose.Schema({
     },
   ],
   notice: { type: String, default: null },
+  isTaken: [{ type: mongoose.Schema.Types.ObjectId, ref: "Student" }],
   githubUrl: { type: String, default: null },
   issue: [
     {

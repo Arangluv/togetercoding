@@ -592,17 +592,39 @@ export const getLectureTitle = async (req, res) => {
 export const getLectureList = async (req, res) => {
   try {
     const { name: urlName } = req.query;
-    const { lecture } = await Lecture.findOne({ urlName }).populate({
-      path: "lecture",
-      populate: {
-        path: "subLecture",
-      },
-    });
+    const { lecture } = await Lecture.findOne({ urlName })
+      .populate({
+        path: "lecture",
+        populate: {
+          path: "subLecture",
+        },
+      })
+      .lean();
+    if (!req.session) {
+      return res
+        .status(404)
+        .json({ message: "강의 리스트를 불러오는데 실패했습니다" });
+    }
     // # CASE1 이렇게 populate된걸 한번에 다 줄지
-    // # CASE2 따로 refined 해야하는지
-
-    return res.status(200).json({ lectureList: lecture });
+    // # CASE2 따로 refined 해야하는지 <<
+    const refinedLecture = lecture.map((mainLecture) => {
+      return {
+        ...mainLecture,
+        subLecture: mainLecture.subLecture.map((subLecture) => {
+          return {
+            ...subLecture,
+            isTaken: subLecture?.isTaken
+              ? subLecture.isTaken.includes(req.session.user.id)
+              : false,
+          };
+        }),
+      };
+    });
+    console.log("refinedLecture");
+    console.log(refinedLecture);
+    return res.status(200).json({ lectureList: refinedLecture });
   } catch (error) {
+    console.log(error);
     return res
       .status(404)
       .json({ message: "강의 리스트를 불러오는데 실패했습니다" });

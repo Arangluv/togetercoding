@@ -3,6 +3,7 @@ import { accessTokenConfig, refreshTokenConfig } from "../config/jwtConfig";
 import jwt from "jsonwebtoken";
 import { cookiesConfig } from "../config/cookieConfig";
 import AWS from "aws-sdk";
+import MongoStore from "connect-mongo";
 
 export const tokenCheck = async (req, res) => {
   try {
