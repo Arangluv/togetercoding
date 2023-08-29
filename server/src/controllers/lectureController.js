@@ -85,12 +85,6 @@ export const postMakeMainTheme = async (req, res) => {
 };
 
 export const postMakeSubTheme = async (req, res) => {
-  // console.log("req.body");
-  // console.log(req.body);
-  // console.log("req.file");
-  // console.log(req.file);
-  // console.log("req.files");
-  // console.log(req.files);
   try {
     const file = req?.file;
     const filePath = req.file?.path;
@@ -614,19 +608,54 @@ export const getLectureList = async (req, res) => {
           return {
             ...subLecture,
             isTaken: subLecture?.isTaken
-              ? subLecture.isTaken.includes(req.session.user.id)
+              ? subLecture.isTaken.findIndex(
+                  (stdId) => stdId.toString() === req.session.user.id
+                ) !== -1
               : false,
           };
         }),
       };
     });
-    console.log("refinedLecture");
-    console.log(refinedLecture);
     return res.status(200).json({ lectureList: refinedLecture });
   } catch (error) {
     console.log(error);
     return res
       .status(404)
       .json({ message: "강의 리스트를 불러오는데 실패했습니다" });
+  }
+};
+
+export const putLectureComplete = async (req, res) => {
+  try {
+    if (!req.session) {
+      throw new Error("올바른 세션이 아닙니다");
+    }
+    const { lectureId, urlName } = req.body;
+    const {
+      user: { id: studentId, name },
+    } = req.session;
+    const subLecture = await SubLecture.findById(lectureId);
+    const lecture = await Lecture.findOne({ urlName });
+    if (!subLecture || !lecture) {
+      throw new Error("강의를 완료하는데 오류가 발생했습니다");
+    }
+    // 학생이 이미 강의를 수강한 경우
+    if (subLecture.isTaken.findIndex((stdId) => stdId === studentId) !== -1) {
+      return res.status(200).send();
+    }
+    // 학생이 강의 수강을 아직 안한 경우
+    await SubLecture.updateOne(
+      { _id: lectureId },
+      {
+        $push: { isTaken: studentId },
+      }
+    );
+    lecture.completeLectureQuantity = lecture.completeLectureQuantity + 1;
+    await lecture.save();
+    return res.status(200).send();
+  } catch (error) {
+    console.log("에러 발생");
+    console.log(error);
+    return res.status(404).json({ error });
   }
 };

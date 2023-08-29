@@ -17,7 +17,7 @@ const subLectureSchema = new mongoose.Schema({
     {
       id: { type: mongoose.Schema.Types.ObjectId, ref: "Student" },
       content: { type: String },
-      createdAT: { type: Date, default: Date.now() },
+      createdAt: { type: Date, default: Date.now() },
     },
   ],
   //   listenLecture: [{ type: mongoose.Schema.Types.ObjectId, ref: "Lecture" }],

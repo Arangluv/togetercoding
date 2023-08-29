@@ -62,21 +62,19 @@ export const postBuyLecture = async (req, res) => {
       return res.status(404).send();
     }
     const { email, lectureId } = req.body;
-    console.log("email?");
-    console.log(email);
+
     // req.session.user => user: { id: '64bf7bde52ce694ab1eef4a0', name: '류현수', authorized: true }
     const buyer = await Student.findOne({
       _id: req.session.user.id,
       name: req.session.user.name,
       email,
     });
-    console.log("buyer");
-    console.log(buyer);
     if (!buyer) {
       return res.status(404).send();
     }
     const lecture = await Lecture.findOne({ _id: lectureId });
     if (!lecture) {
+      console.log("야기?");
       return res.status(404).send();
     }
 
@@ -86,7 +84,6 @@ export const postBuyLecture = async (req, res) => {
     });
     if (isAlreadyPurchased) {
       // 이미 구매했으므로 lecture page로 redirect 시켜주어야함
-      console.log("여기가 실행되어야함");
       return res.status(200).redirect("http://localhost:3000/");
     }
     await Purchase.create({

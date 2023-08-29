@@ -11,6 +11,7 @@ import {
   postMakeLecture,
   postMakeMainTheme,
   postMakeSubTheme,
+  putLectureComplete,
 } from "../controllers/lectureController";
 import AWS from "aws-sdk";
 import multer from "multer";
@@ -63,4 +64,5 @@ lectureRouter.route("/delete-sub-lecture").delete(deleteSubLecture);
 lectureRouter.route("/listen-lectures").get(getListenLecture);
 lectureRouter.route("/lecture-title").get(getLectureTitle);
 lectureRouter.route("/lecture-list").get(getLectureList);
+lectureRouter.route("/complete-lecture").put(putLectureComplete);
 export default lectureRouter;
