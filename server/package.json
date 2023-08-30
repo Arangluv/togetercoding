@@ -1,0 +1,47 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "money coding server",
+  "main": "index.js",
+  "scripts": {
+    "start": "node build/init.js",
+    "build": "babel src -d build",
+    "dev": "nodemon --exec babel-node src/init.js"
+  },
+  "author": "Arang",
+  "license": "ISC",
+  "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "aws-sdk": "^2.1421.0",
+    "axios": "^1.4.0",
+    "bcrypt": "^5.1.0",
+    "connect-mongo": "^5.0.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "fluent-ffmpeg": "^2.1.2",
+    "helmet": "^7.0.0",
+    "jsonwebtoken": "^9.0.1",
+    "mongoose": "^7.3.4",
+    "mongoose-session": "^0.0.4",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "multer-s3": "^2.10.0",
+    "nodemailer": "^6.9.3"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.22.9",
+    "@babel/core": "^7.22.9",
+    "@babel/node": "^7.22.6",
+    "@babel/preset-env": "^7.22.9",
+    "nodemon": "^3.0.1"
+  },
+  "babel": {
+    "presets": [
+      "@babel/env"
+    ]
+  }
+}
