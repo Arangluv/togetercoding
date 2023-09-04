@@ -71,4 +71,10 @@ border-spacing: 0;
 .ql-picker-item::before {
     color: #2f3542;
 }
+.quill > .ql-container > .ql-editor.ql-blank::before{
+    font-size: 15px;
+    color: #f5f6fa;
+    opacity: 0.5;
+    white-space: pre-wrap;
+}
 `;

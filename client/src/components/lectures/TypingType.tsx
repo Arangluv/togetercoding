@@ -2,6 +2,7 @@ import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { commentState, noteState } from "../../atom/atoms";
 import { BsFillPencilFill } from "react-icons/bs";
+import { setCommentRange } from "typescript";
 const Wrapper = styled.div`
   width: 100%;
   height: 10vh;
@@ -75,13 +76,21 @@ export default function TypingType() {
       setNoteActiveState("issueWrite");
     }
   };
+  const handleInActiveNoteClick = () => {
+    setComent("note");
+    setNoteActiveState(null);
+  };
+  const handleInActiveIssueClick = () => {
+    setComent("issue");
+    setNoteActiveState(null);
+  };
   return (
     <Wrapper>
       <ActionBox>
         {comment === "note" ? (
           <ActiveSpan onClick={() => setComent("note")}>노트정리</ActiveSpan>
         ) : (
-          <InActiveSpan onClick={() => setComent("note")}>
+          <InActiveSpan onClick={() => handleInActiveNoteClick()}>
             노트정리
           </InActiveSpan>
         )}
@@ -90,7 +99,7 @@ export default function TypingType() {
             문제가 발생했어요
           </ActiveSpan>
         ) : (
-          <InActiveSpan onClick={() => setComent("issue")}>
+          <InActiveSpan onClick={() => handleInActiveIssueClick()}>
             문제가 발생했어요
           </InActiveSpan>
         )}
