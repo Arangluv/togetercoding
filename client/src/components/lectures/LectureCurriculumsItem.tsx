@@ -59,8 +59,6 @@ export default function LectureCurriculumsItem({
 }: IProps) {
   const navigator = useNavigate();
   const setStudentMainThemeState = useSetRecoilState(studentMainTheme);
-  console.log("lecture 커리큘럼에서 isTaken ?");
-  console.log(isTaken);
   const handleCurriculumsClick = () => {
     setStudentMainThemeState(mainLectureId);
     navigator(lectureId);

@@ -12,10 +12,14 @@ import {
   postMakeLecture,
   postMakeMainTheme,
   postMakeSubTheme,
+  postLectureComment,
+  getLectureComment,
+  postReply,
 } from "../api/lectureApi";
 import { toast } from "react-toastify";
 import { NavigateFunction } from "react-router-dom";
 import { lecturePayment } from "../api/api";
+import { UseFormSetValue } from "react-hook-form";
 
 interface LectureItemProps {
   _id: string;
@@ -289,4 +293,88 @@ export const useCompleteLectureMutation = ({
       },
     });
   return { completeLectureMutate, completeLectureLoading };
+};
+interface postCommentProps {
+  setValue: UseFormSetValue<DProps>;
+  queryClient: QueryClient;
+  subLectureId: string;
+}
+interface DProps {
+  content: string;
+  extraError?: string;
+}
+export const usePostCommentMutation = ({
+  queryClient,
+  setValue,
+  subLectureId,
+}: postCommentProps) => {
+  const { mutate: postCommentMutate } = useMutation({
+    mutationFn: postLectureComment,
+    onSuccess: () => {
+      toast.success("댓글을 등록했습니다");
+      setValue("content", "");
+      return queryClient.invalidateQueries(["comment", subLectureId]);
+    },
+    onError: () => {
+      toast.error("댓글을 등록하는데 실패했습니다");
+    },
+  });
+  return postCommentMutate;
+};
+
+interface GetCommentProps {
+  comment: CommentProps[];
+}
+interface CommentProps {
+  content: string;
+  createAt: string;
+  owner: string;
+  ownerNickname: string;
+  ownerProfileUrl: string;
+  reply: ReplyProps[];
+  subLectureId: string;
+  _id: string;
+}
+interface ReplyProps {
+  authorType: "student" | "admin";
+  content: string;
+  createdAt: string;
+  owner: string;
+  ownerNickname: string;
+  ownerProfileUrl: string;
+  _id: string;
+}
+export const useSubLectureCommentQuery = (lectureId: string) => {
+  const { data: lectureCommentData } = useQuery<GetCommentProps>(
+    ["comment", lectureId],
+    () => getLectureComment(lectureId),
+    {
+      staleTime: 1000 * 60 * 5,
+      cacheTime: Infinity,
+    }
+  );
+  return lectureCommentData;
+};
+interface PostReplyProps {
+  setValue: UseFormSetValue<DProps>;
+  queryClient: QueryClient;
+  subLectureId: string;
+}
+export const useCommentReplyMutation = ({
+  subLectureId,
+  setValue,
+  queryClient,
+}: PostReplyProps) => {
+  const { mutate: commentMutate } = useMutation({
+    mutationFn: postReply,
+    onSuccess: () => {
+      toast.success("댓글을 달았습니다");
+      setValue("content", "");
+      return queryClient.invalidateQueries(["comment", subLectureId]);
+    },
+    onError: () => {
+      toast.error("댓글을 다는데 문제가 발생했습니다");
+    },
+  });
+  return commentMutate;
 };

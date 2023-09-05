@@ -2,9 +2,12 @@ import Lecture from "../models/Lecture";
 import LectureMainTheme from "../models/LectureMainTheme";
 import SubLecture from "../models/SubLecture";
 import Purchase from "../models/Purchase";
+import Student from "../models/Student";
 import AWS from "aws-sdk";
 import fs from "fs";
 import path from "path";
+import Note from "../models/Note";
+import Reply from "../models/Reply";
 AWS.config.update({
   region: process.env.AWS_S3_REGION,
   accessKeyId: process.env.AWS_S3_ACCESS_KEY,
@@ -657,5 +660,92 @@ export const putLectureComplete = async (req, res) => {
     console.log("에러 발생");
     console.log(error);
     return res.status(404).json({ error });
+  }
+};
+
+export const postComment = async (req, res) => {
+  const { content, subLectureId } = req.body;
+  try {
+    if (!req.session) {
+      throw new Error("사용자 세션이 없습니다");
+    }
+    const subLecture = await SubLecture.findById(subLectureId);
+    const owner = req.session.user.id;
+    if (!subLecture || !owner) {
+      return res.status(404).send();
+    }
+    const commentOwner = await Student.findById(owner);
+    if (!commentOwner) {
+      throw new Error("코멘트를 저장하는데 문제가 발생했습니다.");
+    }
+    const comment = await Note.create({
+      owner,
+      ownerProfileUrl: commentOwner.profileImg,
+      ownerNickname: commentOwner.nickname,
+      subLectureId,
+      content,
+    });
+    await SubLecture.updateOne(
+      { _id: subLectureId },
+      { $push: { studentNote: comment._id } }
+    );
+    return res.status(200).json({ message: "코멘트를 추가했습니다" });
+  } catch (error) {
+    console.log(error);
+    return res.status(404).send();
+  }
+};
+
+export const getComment = async (req, res) => {
+  try {
+    const { subLectureId } = req.query;
+    const subLecture = await SubLecture.findById(subLectureId).populate({
+      path: "studentNote",
+      populate: {
+        path: "reply",
+        Model: "Reply",
+      },
+    });
+    if (!subLecture) {
+      throw new Error("코멘트를 찾는데 문제가 발생했습니다");
+    }
+    const { studentNote } = subLecture;
+    return res.status(200).json({ comment: studentNote });
+  } catch (error) {
+    console.log(error);
+    return res.status(404).send();
+  }
+};
+
+export const postReply = async (req, res) => {
+  try {
+    const { content, commentId } = req.body;
+    const studentId = req.session.user.id;
+    // 댓글을 단 사람의 admin check
+    let stdType = null;
+    const student = await Student.findById(studentId);
+    console.log("student");
+    console.log(student);
+    if (
+      student.email === "arang@togethercoding.com" &&
+      student.nickname === "같이코딩"
+    ) {
+      stdType = "admin";
+    } else {
+      stdType = "student";
+    }
+    const reply = await Reply.create({
+      owner: studentId,
+      ownerProfileUrl: student.profileImg,
+      ownerNickname: student.nickname,
+      authorType: stdType, // 작성자 타입 student or admin
+      content,
+    });
+    await Note.updateOne({ _id: commentId }, { $push: { reply: reply._id } });
+
+    return res.status(200).send();
+  } catch (error) {
+    console.log(error);
+    return res.status(404).send();
   }
 };

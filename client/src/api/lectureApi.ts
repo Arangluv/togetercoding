@@ -142,3 +142,36 @@ export const putCompleteLecture = async (data: CompleteLectureProps) => {
     data,
   });
 };
+interface CommentProps {
+  subLectureId: string;
+  content: string;
+}
+export const postLectureComment = async (data: CommentProps) => {
+  return await axios({
+    url: `${BASE_URL}/lectures/comments`,
+    method: "POST",
+    data,
+    withCredentials: true,
+  });
+};
+
+export const getLectureComment = async (subLectureId: string) => {
+  return await axios({
+    url: `${BASE_URL}/lectures/std-comments`,
+    method: "GET",
+    params: { subLectureId },
+    withCredentials: true,
+  }).then((result) => result.data);
+};
+interface ReplyProps {
+  commentId: string;
+  content: string;
+}
+export const postReply = async (data: ReplyProps) => {
+  return await axios({
+    url: `${BASE_URL}/lectures/reply`,
+    method: "POST",
+    data,
+    withCredentials: true,
+  });
+};

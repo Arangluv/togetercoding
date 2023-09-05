@@ -5,6 +5,10 @@ import { studentLoginState } from "../../atom/atoms";
 import { useEffect, useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { HiOutlineInformationCircle } from "react-icons/hi";
+import { useForm } from "react-hook-form";
+import { useLocation } from "react-router";
+import { usePostCommentMutation } from "../../hooks/lecture";
+import { useQueryClient } from "@tanstack/react-query";
 const Wrapper = styled.div`
   width: 100%;
   min-height: 30vh;
@@ -83,6 +87,11 @@ const NicknameContainer = styled.div`
     color: ${(props) => props.theme.textColor};
     font-weight: 600;
     margin-left: 1vw;
+    small {
+      margin-left: 1vw;
+      color: ${(props) => props.theme.errorColor};
+      font-size: 1vw;
+    }
   }
 `;
 const NoteForm = styled.form`
@@ -144,15 +153,38 @@ const SubmitLabel = styled.label`
     display: none;
   }
 `;
+interface DProps {
+  content: string;
+  extraError?: string;
+}
 export default function NotePart() {
   const student = useRecoilValue(studentLoginState);
   const [profilePreview, setProfilePreview] = useState("");
+  const {
+    register,
+    formState,
+    setError,
+    clearErrors,
+    handleSubmit,
+    watch,
+    setValue,
+  } = useForm<DProps>();
+  const subLectureId = useLocation().pathname.split("/")[3];
+  const queryClient = useQueryClient();
+  const postCommentMutate = usePostCommentMutation({
+    setValue,
+    queryClient,
+    subLectureId,
+  });
   useEffect(() => {
     if (!student) {
       return;
     }
     setProfilePreview(student.profileImg);
   }, [student]);
+  const onValid = (data: DProps) => {
+    postCommentMutate({ content: data.content, subLectureId });
+  };
   return (
     <Wrapper>
       <AlertContainer>
@@ -178,12 +210,23 @@ export default function NotePart() {
           )}
         </ProfileAvatarContainer>
         <NicknameContainer>
-          <span>{student.nickname}</span>
+          <span>
+            {student.nickname}{" "}
+            {formState.errors ? (
+              <small>{formState.errors.content?.message}</small>
+            ) : null}
+          </span>
         </NicknameContainer>
       </ProfileContainer>
-      <NoteForm>
-        <NoteLabel>
-          <textarea placeholder="이런게 도움이 됐고 이건 기억하고 싶어요!"></textarea>
+      <NoteForm onSubmit={handleSubmit(onValid)}>
+        <NoteLabel htmlFor="lecture_comment">
+          <textarea
+            {...register("content", {
+              required: "코멘트를 작성해주세요",
+            })}
+            id="lecture_comment"
+            placeholder="이런게 도움이 됐고 이건 기억하고 싶어요!"
+          ></textarea>
         </NoteLabel>
         <SubmitContainer>
           <SubmitLabel>

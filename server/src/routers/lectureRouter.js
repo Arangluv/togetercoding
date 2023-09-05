@@ -3,14 +3,17 @@ import {
   deleteMainTheme,
   deleteSubLecture,
   getAllLecture,
+  getComment,
   getLectureList,
   getLectureTitle,
   getListenLecture,
   getMainLecture,
   getSubLecture,
+  postComment,
   postMakeLecture,
   postMakeMainTheme,
   postMakeSubTheme,
+  postReply,
   putLectureComplete,
 } from "../controllers/lectureController";
 import AWS from "aws-sdk";
@@ -65,4 +68,7 @@ lectureRouter.route("/listen-lectures").get(getListenLecture);
 lectureRouter.route("/lecture-title").get(getLectureTitle);
 lectureRouter.route("/lecture-list").get(getLectureList);
 lectureRouter.route("/complete-lecture").put(putLectureComplete);
+lectureRouter.route("/comments").post(postComment);
+lectureRouter.route("/std-comments").get(getComment);
+lectureRouter.route("/reply").post(postReply)
 export default lectureRouter;

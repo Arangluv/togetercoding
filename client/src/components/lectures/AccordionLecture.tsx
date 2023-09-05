@@ -64,8 +64,6 @@ export default function AccordionLecture() {
 
   const [chapters, setChapter] = React.useState<string[]>([]);
   const lectureListData = useLectureListQuery(urlName ? urlName : "");
-  console.log("lectureList Data ?");
-  console.log(lectureListData);
   const [lectureList, setLectureList] = useRecoilState(lectureListState);
   const [subLectureList, setSubLectureList] =
     useRecoilState(subLectureListState);
