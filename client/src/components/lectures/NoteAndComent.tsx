@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRecoilValue } from "recoil";
 import { studentLoginState } from "../../atom/atoms";
+import { FaUserCircle } from "react-icons/fa";
 const Wrapper = styled.div`
   width: 100%;
   min-height: 20vh;
@@ -110,6 +111,11 @@ const ReplyProfileContainer = styled.div`
     width: 100%;
     height: 100%;
   }
+  svg {
+    width: 100%;
+    height: 100%;
+    color: ${(props) => props.theme.textColor};
+  }
 `;
 interface ContentBackgroundProps {
   authorType: string;
@@ -176,6 +182,11 @@ const ReplyFormProfileContainer = styled.div`
   margin-right: 1vw;
   img {
     border-radius: 100%;
+    width: 100%;
+    height: 100%;
+  }
+  svg {
+    color: white;
     width: 100%;
     height: 100%;
   }
@@ -271,8 +282,6 @@ export default function NoteAndComent() {
     }
     replyMutate({ content: data.content, commentId: writeReply });
   };
-  console.log("lectureCommentData");
-  console.log(lectureCommentData);
   return (
     <Wrapper>
       {lectureCommentData?.comment?.length ? (
@@ -303,10 +312,14 @@ export default function NoteAndComent() {
                 {writeReply === comment._id ? (
                   <ReplyForm onSubmit={handleSubmit(onValid)}>
                     <ReplyFormProfileContainer>
-                      <img
-                        src={loginState.profileImg}
-                        alt="reply user profile image"
-                      />
+                      {loginState.profileImg ? (
+                        <img
+                          src={loginState.profileImg}
+                          alt="reply user profile image"
+                        />
+                      ) : (
+                        <FaUserCircle />
+                      )}
                     </ReplyFormProfileContainer>
                     <ReplyFormBox>
                       <ReplyInfoContainer>
@@ -338,12 +351,18 @@ export default function NoteAndComent() {
                   ? comment.reply.map((reply) => {
                       return (
                         <ReplyContainer>
-                          <ReplyProfileContainer>
-                            <img
-                              src={reply.ownerProfileUrl}
-                              alt="reply user profile image"
-                            />
-                          </ReplyProfileContainer>
+                          {reply.ownerProfileUrl ? (
+                            <ReplyProfileContainer>
+                              <img
+                                src={reply.ownerProfileUrl}
+                                alt="reply user profile image"
+                              />
+                            </ReplyProfileContainer>
+                          ) : (
+                            <ReplyProfileContainer>
+                              <FaUserCircle />
+                            </ReplyProfileContainer>
+                          )}
                           <ReplyContentBox authorType={reply.authorType}>
                             <ReplyInfoContainer>
                               <span>

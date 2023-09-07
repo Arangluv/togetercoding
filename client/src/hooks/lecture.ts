@@ -15,6 +15,7 @@ import {
   postLectureComment,
   getLectureComment,
   postReply,
+  postIssue,
 } from "../api/lectureApi";
 import { toast } from "react-toastify";
 import { NavigateFunction } from "react-router-dom";
@@ -377,4 +378,16 @@ export const useCommentReplyMutation = ({
     },
   });
   return commentMutate;
+};
+
+export const usePostIssueMuation = () => {
+  const { mutate: postIssueMutate } = useMutation({
+    mutationFn: postIssue,
+    onSuccess: () => {
+      toast.success("이슈를 생성했습니다!");
+    },
+    onError: () => {
+      toast.error("이슈를 생성하는데 실패했습니다");
+    },
+  });
 };

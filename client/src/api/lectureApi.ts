@@ -175,3 +175,12 @@ export const postReply = async (data: ReplyProps) => {
     withCredentials: true,
   });
 };
+
+export const postIssue = async (data: FormData) => {
+  return await axios({
+    url: `${BASE_URL}/lectures/issues`,
+    method: "POST",
+    data,
+    withCredentials: true,
+  });
+};

@@ -1,97 +1,120 @@
-import styled from "styled-components";
-import IssueNote from "../dashborad/IssueNote";
+import * as React from "react";
+import { styled } from "@mui/material/styles";
+import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
+import MuiAccordion, { AccordionProps } from "@mui/material/Accordion";
+import MuiAccordionSummary, {
+  AccordionSummaryProps,
+} from "@mui/material/AccordionSummary";
+import MuiAccordionDetails from "@mui/material/AccordionDetails";
+import Typography from "@mui/material/Typography";
+import IssueItemContainer from "./IssueItemContainer";
+import IssueTitle from "./IssueTitle";
 
-const Wrapper = styled.div`
-  width: 100%;
-  height: auto;
-  padding: 1vw;
-`;
+const Accordion = styled((props: AccordionProps) => (
+  <MuiAccordion disableGutters elevation={0} square {...props} />
+))(({ theme }) => ({
+  // border: `1px solid ${theme.palette.divider}`,
+  marginBottom: "10px",
+  "&:not(:last-child)": {
+    borderBottom: 0,
+  },
+  "&:before": {
+    display: "none",
+  },
+}));
 
-const NoIssueBox = styled.div`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 5vw;
-  span {
-    font-size: 1.3vw;
-    color: #747d8c;
-  }
-`;
-const IssueContainer = styled.div`
-  width: 100%;
-  height: auto;
-  display: flex;
-  flex-direction: column;
-  margin-top: 2vw;
-`;
+const AccordionSummary = styled((props: AccordionSummaryProps) => (
+  <MuiAccordionSummary
+    expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: "0.9rem" }} />}
+    {...props}
+  />
+))(({ theme }) => ({
+  backgroundColor: "#353b48",
+  color: "white",
+  flexDirection: "row-reverse",
+  "& .MuiAccordionSummary-expandIconWrapper.Mui-expanded": {
+    transform: "rotate(90deg)",
+  },
+  "& .MuiAccordionSummary-content": {
+    marginLeft: theme.spacing(1),
+  },
+}));
 
-const IssueReplyBox = styled.div`
-  width: 100%;
-  height: auto;
-  padding: 1vw;
-  display: flex;
-  flex-direction: column;
-  border-radius: 10px;
-  background-color: rgba(255, 165, 2, 0.5);
-  margin-bottom: 1vw;
-`;
-const IssueReplyInfo = styled.div`
-  width: 100%;
-  padding: 1vw;
-  display: flex;
-  justify-content: space-between;
-  span {
-    font-weight: 600;
-    color: ${(props) => props.theme.textColor};
-    font-size: 1.3vw;
-  }
-  small {
-    color: ${(props) => props.theme.textColor};
-    opacity: 0.8;
-  }
-`;
-const ReplyContent = styled.div`
-  width: 100%;
-  padding: 1vw;
-  p {
-    color: ${(props) => props.theme.textColor};
-    font-size: 1.2vw;
-    padding: 1vw;
-    line-height: 1.5;
-  }
-`;
+const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
+  padding: 0,
+  // borderTop: "1px solid rgba(0, 0, 0, .125)",
+}));
+
 export default function IssuePart() {
+  const [expanded, setExpanded] = React.useState<string | false>("panel1");
+
+  const handleChange =
+    (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
+      setExpanded(newExpanded ? panel : false);
+    };
+
   return (
-    <Wrapper>
-      {false ? (
-        <NoIssueBox>
-          <span>등록된 이슈가 없습니다</span>
-        </NoIssueBox>
-      ) : (
-        <IssueContainer>
-          <IssueNote />
-          <IssueReplyBox>
-            <IssueReplyInfo>
-              <span>같이코딩</span>
-              <small>2023.07.23</small>
-            </IssueReplyInfo>
-            <ReplyContent>
-              <p>
-                대법원에 대법관을 둔다. 다만, 법률이 정하는 바에 의하여 대법관이
-                아닌 법관을 둘 수 있다. 국회의원의 수는 법률로 정하되, 200인
-                이상으로 한다. 국무총리는 국무위원의 해임을 대통령에게 건의할 수
-                있다. 모든 국민은 근로의 의무를 진다. 국가는 근로의 의무의
-                내용과 조건을 민주주의원칙에 따라 법률로 정한다. 모든 국민은
-                신속한 재판을 받을 권리를 가진다. 형사피고인은 상당한 이유가
-                없는 한 지체없이 공개재판을 받을 권리를 가진다.
-              </p>
-            </ReplyContent>
-          </IssueReplyBox>
-          <IssueNote />
-          <IssueNote />
-        </IssueContainer>
-      )}
-    </Wrapper>
+    <div style={{ width: "100%", padding: "1vw" }}>
+      <Accordion
+        expanded={expanded === "panel1"}
+        onChange={handleChange("panel1")}
+      >
+        <AccordionSummary
+          aria-controls="panel1d-content"
+          id="panel1d-header"
+          sx={{
+            "& .MuiSvgIcon-root": {
+              color: "#C2C9D1",
+            },
+          }}
+        >
+          <Typography sx={{ width: "100%" }}>
+            <IssueTitle />
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <IssueItemContainer></IssueItemContainer>
+          {/* <Typography>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+            malesuada lacus ex, sit amet blandit leo lobortis eget. Lorem ipsum
+            dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada
+            lacus ex, sit amet blandit leo lobortis eget.
+          </Typography> */}
+        </AccordionDetails>
+      </Accordion>
+
+      <Accordion
+        expanded={expanded === "panel2"}
+        onChange={handleChange("panel2")}
+      >
+        <AccordionSummary aria-controls="panel2d-content" id="panel2d-header">
+          <Typography>Collapsible Group Item #2</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+            malesuada lacus ex, sit amet blandit leo lobortis eget. Lorem ipsum
+            dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada
+            lacus ex, sit amet blandit leo lobortis eget.
+          </Typography>
+        </AccordionDetails>
+      </Accordion>
+      <Accordion
+        expanded={expanded === "panel3"}
+        onChange={handleChange("panel3")}
+      >
+        <AccordionSummary aria-controls="panel3d-content" id="panel3d-header">
+          <Typography>Collapsible Group Item #3</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+            malesuada lacus ex, sit amet blandit leo lobortis eget. Lorem ipsum
+            dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada
+            lacus ex, sit amet blandit leo lobortis eget.
+          </Typography>
+        </AccordionDetails>
+      </Accordion>
+    </div>
   );
 }

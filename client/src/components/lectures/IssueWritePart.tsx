@@ -1,10 +1,11 @@
 import styled from "styled-components";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 import { lectureNotification } from "../../atom/atoms";
 import { BsFillImageFill } from "react-icons/bs";
+import { useForm } from "react-hook-form";
 const Wrapper = styled.div`
   width: 100%;
   min-height: 30vh;
@@ -65,7 +66,7 @@ const ImageLabel = styled.label`
   margin-bottom: 1vw;
   flex-direction: column;
   width: 100%;
-  height: 30vh;
+  min-height: 30vh;
   input[type="file"] {
     display: none;
   }
@@ -87,6 +88,15 @@ const ImageLabel = styled.label`
     &:hover {
       cursor: pointer;
     }
+  }
+`;
+const UploadImageContainer = styled.div`
+  width: 100%;
+  min-height: 30vh;
+  object-fit: cover;
+  img {
+    width: 100%;
+    height: 100%;
   }
 `;
 const SubmitLabel = styled.label`
@@ -113,14 +123,56 @@ const SubmitLabel = styled.label`
     }
   }
 `;
+interface DProps {
+  title: string;
+  content: string;
+  referenceImage: FileList;
+}
 export default function IssueWritePart() {
-  const [lectureNoti, setLectureNoti] = useRecoilState(lectureNotification);
+  const [issueContent, setIssueContent] = useState("");
+  const [preview, setPreview] = useState("");
+  const { register, formState, handleSubmit, watch, setValue } =
+    useForm<DProps>();
+  const handleContentChange = (event: string) => {
+    setValue("content", event);
+    setIssueContent(event);
+  };
+  useEffect(() => {
+    if (watch("referenceImage").length === 0) {
+      return;
+    }
+    const uploadImagePreview = URL.createObjectURL(watch("referenceImage")[0]);
+    setPreview(uploadImagePreview);
+
+    return () => URL.revokeObjectURL(uploadImagePreview);
+  }, [watch("referenceImage")]);
+  console.log("Issue Content ?");
+  console.log(watch());
+  const onValid = (data: DProps) => {
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("content", data.content);
+    if (data.referenceImage[0]) {
+      formData.append("referenceImage", data.referenceImage[0]);
+    }
+  };
   return (
     <Wrapper>
       <IssuForm>
         <TitleLabel htmlFor="title">
           <span>제목</span>
-          <input id="title" type="text" placeholder="이슈 제목을 적어주세요" />
+          <input
+            {...register("title", {
+              required: "이슈 제목을 입력주세요",
+              minLength: {
+                value: 3,
+                message: "최소 3글자 이상으로 적어주세요",
+              },
+            })}
+            id="title"
+            type="text"
+            placeholder="이슈 제목을 적어주세요"
+          />
         </TitleLabel>
         <ContentLabel>
           <span>내용</span>
@@ -150,16 +202,27 @@ export default function IssueWritePart() {
               "link",
               "image",
             ]}
-            value={lectureNoti}
-            onChange={setLectureNoti}
+            value={issueContent}
+            onChange={(event) => handleContentChange(event)}
           />
         </QuillWrapper>
-        <ImageLabel>
-          <input type="file" accept=".jpg .png .jpeg .gif" />
-          <span>
-            <BsFillImageFill />
-            업로드 할 이미지가 있나요? (파일 형식 jpg, png, gif, jpeg)
-          </span>
+        <ImageLabel htmlFor="issue_image">
+          <input
+            {...register("referenceImage")}
+            id="issue_image"
+            type="file"
+            accept="image/*"
+          />
+          {preview ? (
+            <UploadImageContainer>
+              <img src={preview} alt="issue reference image preview" />
+            </UploadImageContainer>
+          ) : (
+            <span>
+              <BsFillImageFill />
+              업로드 할 이미지가 있나요?
+            </span>
+          )}
         </ImageLabel>
         <SubmitLabel htmlFor="note_submit">
           <span>저장하기</span>
