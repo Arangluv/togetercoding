@@ -6,6 +6,9 @@ import { useRecoilState } from "recoil";
 import { lectureNotification } from "../../atom/atoms";
 import { BsFillImageFill } from "react-icons/bs";
 import { useForm } from "react-hook-form";
+import { usePostIssueMuation } from "../../hooks/lecture";
+import { useLocation } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 const Wrapper = styled.div`
   width: 100%;
   min-height: 30vh;
@@ -35,6 +38,11 @@ const TitleLabel = styled.label`
     font-weight: 600;
     color: ${(props) => props.theme.textColor};
     margin-bottom: 1vw;
+    small {
+      margin-left: 0.5vw;
+      color: ${(props) => props.theme.errorColor};
+      font-size: 1vw;
+    }
   }
   input[type="text"] {
     width: 60%;
@@ -55,6 +63,11 @@ const ContentLabel = styled.label`
     font-weight: 600;
     color: ${(props) => props.theme.textColor};
     margin-bottom: 0.5vw;
+    small {
+      margin-left: 0.5vw;
+      color: ${(props) => props.theme.errorColor};
+      font-size: 1vw;
+    }
   }
 `;
 const QuillWrapper = styled.div`
@@ -80,7 +93,7 @@ const ImageLabel = styled.label`
     border-radius: 10px;
     color: ${(props) => props.theme.textColor};
     width: 100%;
-    height: 100%;
+    height: 30vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -92,9 +105,11 @@ const ImageLabel = styled.label`
 `;
 const UploadImageContainer = styled.div`
   width: 100%;
-  min-height: 30vh;
-  object-fit: cover;
+  height: 50vh;
+  border: 1px dotted ${(props) => props.theme.textColor};
+  border-radius: 10px;
   img {
+    object-fit: contain;
     width: 100%;
     height: 100%;
   }
@@ -129,10 +144,27 @@ interface DProps {
   referenceImage: FileList;
 }
 export default function IssueWritePart() {
+  const subLectureId = useLocation().pathname.split("/")[3];
+  const queryClient = useQueryClient();
   const [issueContent, setIssueContent] = useState("");
   const [preview, setPreview] = useState("");
-  const { register, formState, handleSubmit, watch, setValue } =
-    useForm<DProps>();
+  const {
+    register,
+    formState,
+    handleSubmit,
+    watch,
+    setValue,
+    setError,
+    clearErrors,
+  } = useForm<DProps>();
+  const postIssueMutate = usePostIssueMuation({
+    queryClient,
+    subLectureId,
+    preview,
+    setIssueContent,
+    setValue,
+    setPreview,
+  });
   const handleContentChange = (event: string) => {
     setValue("content", event);
     setIssueContent(event);
@@ -146,21 +178,31 @@ export default function IssueWritePart() {
 
     return () => URL.revokeObjectURL(uploadImagePreview);
   }, [watch("referenceImage")]);
-  console.log("Issue Content ?");
-  console.log(watch());
   const onValid = (data: DProps) => {
     const formData = new FormData();
     formData.append("title", data.title);
     formData.append("content", data.content);
+    formData.append("subLectureId", subLectureId);
+    if (issueContent === "" || issueContent === "<p><br/></p>") {
+      setError("content", { message: "이슈 내용을 적어주세요" });
+      return;
+    }
+
     if (data.referenceImage[0]) {
       formData.append("referenceImage", data.referenceImage[0]);
     }
+    postIssueMutate(formData);
   };
   return (
     <Wrapper>
-      <IssuForm>
+      <IssuForm onSubmit={handleSubmit(onValid)}>
         <TitleLabel htmlFor="title">
-          <span>제목</span>
+          <span>
+            제목
+            {formState.errors.title ? (
+              <small>{formState.errors.title.message}</small>
+            ) : null}
+          </span>
           <input
             {...register("title", {
               required: "이슈 제목을 입력주세요",
@@ -175,7 +217,12 @@ export default function IssueWritePart() {
           />
         </TitleLabel>
         <ContentLabel>
-          <span>내용</span>
+          <span>
+            내용
+            {formState.errors.content ? (
+              <small>{formState.errors.content.message}</small>
+            ) : null}
+          </span>
         </ContentLabel>
         <QuillWrapper>
           <ReactQuill
@@ -204,6 +251,7 @@ export default function IssueWritePart() {
             ]}
             value={issueContent}
             onChange={(event) => handleContentChange(event)}
+            onFocus={() => clearErrors("content")}
           />
         </QuillWrapper>
         <ImageLabel htmlFor="issue_image">

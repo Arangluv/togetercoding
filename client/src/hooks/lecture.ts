@@ -16,6 +16,8 @@ import {
   getLectureComment,
   postReply,
   postIssue,
+  getIssue,
+  postIssueReply,
 } from "../api/lectureApi";
 import { toast } from "react-toastify";
 import { NavigateFunction } from "react-router-dom";
@@ -379,15 +381,99 @@ export const useCommentReplyMutation = ({
   });
   return commentMutate;
 };
-
-export const usePostIssueMuation = () => {
+interface IssueDProps {
+  title: string;
+  content: string;
+  referenceImage: FileList;
+}
+interface IssueMutateProps {
+  queryClient: QueryClient;
+  subLectureId: string;
+  preview: string;
+  setIssueContent: React.Dispatch<React.SetStateAction<string>>;
+  setValue: UseFormSetValue<IssueDProps>;
+  setPreview: React.Dispatch<React.SetStateAction<string>>;
+}
+export const usePostIssueMuation = ({
+  queryClient,
+  subLectureId,
+  setIssueContent,
+  preview,
+  setPreview,
+  setValue,
+}: IssueMutateProps) => {
   const { mutate: postIssueMutate } = useMutation({
     mutationFn: postIssue,
     onSuccess: () => {
       toast.success("이슈를 생성했습니다!");
+      setIssueContent("");
+      setValue("title", "");
+      setPreview("");
+      queryClient.invalidateQueries(["issue", subLectureId]);
+      return URL.revokeObjectURL(preview);
     },
     onError: () => {
       toast.error("이슈를 생성하는데 실패했습니다");
     },
   });
+  return postIssueMutate;
+};
+
+interface IssueProps {
+  _id: string;
+  owner: string;
+  ownerProfileUrl: null | string;
+  ownerNickname: string;
+  title: string;
+  subLectureId: string;
+  responseState: false;
+  content: string;
+  referenceImg: string | null;
+  createdAt: string;
+  issueReply: IssueReplyProps[];
+}
+interface IssueReplyProps {
+  _id: string;
+  authorType: string;
+  content: string;
+  owner: string;
+  ownerNickname: string;
+  ownerProfileUrl: string | null;
+}
+export const useGetIssueQuery = (subLectureId: string) => {
+  const { data: issueData } = useQuery<IssueProps[]>(
+    ["issue", subLectureId],
+    () => getIssue(subLectureId),
+    {
+      staleTime: 1000 * 60 * 5,
+      cacheTime: Infinity,
+    }
+  );
+  return issueData;
+};
+interface IssueReplyMutateProps {
+  queryClient: QueryClient;
+  subLectureId: string;
+  setReplyState: React.Dispatch<React.SetStateAction<string | null>>;
+  setValue: React.Dispatch<React.SetStateAction<string>>;
+}
+export const usePostIssueReplyMutation = ({
+  queryClient,
+  subLectureId,
+  setReplyState,
+  setValue,
+}: IssueReplyMutateProps) => {
+  const { mutate: issueReplyMutate } = useMutation({
+    mutationFn: postIssueReply,
+    onSuccess: () => {
+      toast.success("이슈에 댓글을 달았습니다");
+      setValue("");
+      setReplyState(null);
+      return queryClient.invalidateQueries(["issue", subLectureId]);
+    },
+    onError: () => {
+      toast.error("이슈에 댓글을 다는데 문제가 발생했습니다");
+    },
+  });
+  return issueReplyMutate;
 };

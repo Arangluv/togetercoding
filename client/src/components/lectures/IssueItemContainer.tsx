@@ -1,7 +1,14 @@
 import styled from "styled-components";
 import { FaUserCircle } from "react-icons/fa";
 import ReactQuill from "react-quill";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import DOMpurify from "dompurify";
+import { useRecoilValue } from "recoil";
+import { studentLoginState } from "../../atom/atoms";
+import { usePostIssueReplyMutation } from "../../hooks/lecture";
+import { useForm } from "react-hook-form";
+import { useQueryClient } from "@tanstack/react-query";
+import { useLocation } from "react-router-dom";
 const Wrapper = styled.div`
   width: 100%;
   min-height: 10vh;
@@ -63,7 +70,7 @@ const IssueReply = styled.small`
     filter: brightness(1.1);
   }
 `;
-const IssueContent = styled.p`
+const IssueContent = styled.div`
   white-space: pre-wrap;
   padding: 1vw 2vw;
   line-height: 1.6;
@@ -101,6 +108,11 @@ const IsuueLabel = styled.label`
     font-size: 1.2vw;
     font-weight: 600;
     color: ${(props) => props.theme.textColor};
+    small {
+      font-size: 1vw;
+      color: ${(props) => props.theme.errorColor};
+      margin-left: 0.5vw;
+    }
   }
 `;
 const QuillWrapper = styled.div`
@@ -135,53 +147,108 @@ const SubmitLabel = styled.label`
     }
   }
 `;
-export default function IssueItemContainer() {
-  const [value, setValue] = useState("");
+interface IProps {
+  _id: string;
+  ownerProfileUrl: null | string;
+  ownerNickname: string;
+  content: string;
+  referenceImg: string | null;
+  issueReply: IssueReplyProps[];
+}
+interface IssueReplyProps {
+  _id: string;
+  authorType: string;
+  content: string;
+  owner: string;
+  ownerNickname: string;
+  ownerProfileUrl: string | null;
+}
+interface DProps {
+  extraError?: string;
+}
+export default function IssueItemContainer({
+  _id,
+  ownerProfileUrl,
+  ownerNickname,
+  content,
+  referenceImg,
+  issueReply,
+}: IProps) {
+  const queryClient = useQueryClient();
+  const subLectureId = useLocation().pathname.split("/")[3];
+  const stdLoginState = useRecoilValue(studentLoginState);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [value, setValue] = useState(""); // 빈 경우는 <p><br></p> 경우도 존재;
   const [replyState, setReplyState] = useState<null | string>(null);
-  const handleIssueReplyClick = () => {
+  const postReplyMutate = usePostIssueReplyMutation({
+    queryClient,
+    subLectureId,
+    setReplyState,
+    setValue,
+  });
+  const { setError, clearErrors, handleSubmit, formState } = useForm<DProps>();
+  const handleIssueReplyClick = (clickId: string) => {
     if (replyState === null) {
-      setReplyState("asd");
+      setReplyState(clickId);
+      return;
+    }
+    if (clickId === _id) {
+      setReplyState(null);
       return;
     }
     setReplyState(null);
+  };
+  useEffect(() => {
+    if (
+      process.env.REACT_APP_ADMIN_EMAIL == stdLoginState.email &&
+      process.env.REACT_APP_ADMIN_USERNAME === stdLoginState.username
+    ) {
+      setIsAdmin(true);
+      return;
+    }
+    return;
+  }, [stdLoginState]);
+  const onValid = () => {
+    if (value === "") {
+      setError("extraError", { message: "답글내용을 입력해주세요" });
+      return;
+    }
+    if (value === "<p><br></p>") {
+      setError("extraError", { message: "답글내용을 입력해주세요" });
+      return;
+    }
+    postReplyMutate({ content: value, issueId: _id });
   };
   return (
     <Wrapper>
       <IssueContainer isAdmin={false}>
         <InfoBox>
           <InfoProfile>
-            {false ? (
-              <img
-                src="https://www.asemhobby.co.kr/shopimages/ysacademy/003003000700.jpg?1678433700"
-                alt="issue writer profile image"
-              />
+            {ownerProfileUrl ? (
+              <img src={ownerProfileUrl} alt="issue writer profile image" />
             ) : (
               <FaUserCircle />
             )}
           </InfoProfile>
-          <span>gkgkgk2</span>
-          <IssueReply onClick={() => handleIssueReplyClick()}>
-            답글달기
-          </IssueReply>
+          <span>{ownerNickname}</span>
+          {isAdmin ? (
+            <IssueReply onClick={() => handleIssueReplyClick(_id)}>
+              답글달기
+            </IssueReply>
+          ) : null}
         </InfoBox>
-        <IssueContent>
-          농업생산성의 제고와 농지의 합리적인 이용을 위하거나 불가피한 사정으로
-          발생하는 농지의 임대차와 위탁경영은 법률이 정하는 바에 의하여
-          인정된다. 모든 국민은 인간다운 생활을 할 권리를 가진다. 군인은 현역을
-          면한 후가 아니면 국무위원으로 임명될 수 없다. 혼인과 가족생활은 개인의
-          존엄과 양성의 평등을 기초로 성립되고 유지되어야 하며, 국가는 이를
-          보장한다.보장한다.보장한다.보장한다.보장한다.보장한다.보장한다.보장한다.보장한다.보장한다.보장한다.보장한
-        </IssueContent>
-        <IssueImage>
-          <img
-            src="https://dojang.io/pluginfile.php/17539/mod_forum/post/3439/my%20code.JPG"
-            alt="issue reference image "
-          />
-        </IssueImage>
+        <IssueContent
+          dangerouslySetInnerHTML={{ __html: DOMpurify.sanitize(content) }}
+        />
+        {referenceImg ? (
+          <IssueImage>
+            <img src={referenceImg} alt="issue reference image " />
+          </IssueImage>
+        ) : null}
       </IssueContainer>
 
       {replyState ? (
-        <IssueReplyForm>
+        <IssueReplyForm onSubmit={handleSubmit(onValid)}>
           <InfoBox>
             <InfoProfile>
               <img
@@ -192,7 +259,12 @@ export default function IssueItemContainer() {
             <span>같이코딩</span>
           </InfoBox>
           <IsuueLabel>
-            <span>답변 내용</span>
+            <span>
+              답변 내용
+              {formState.errors.extraError ? (
+                <small>{formState.errors.extraError.message}</small>
+              ) : null}
+            </span>
           </IsuueLabel>
           <QuillWrapper>
             <ReactQuill
@@ -221,6 +293,7 @@ export default function IssueItemContainer() {
               ]}
               value={value}
               onChange={setValue}
+              onFocus={() => clearErrors("extraError")}
             />
           </QuillWrapper>
           <SubmitLabel htmlFor="issue_reply_submit">
@@ -229,29 +302,35 @@ export default function IssueItemContainer() {
           </SubmitLabel>
         </IssueReplyForm>
       ) : null}
-      <IssueContainer isAdmin={true}>
-        <InfoBox>
-          <InfoProfile>
-            {true ? (
-              <img
-                src="https://www.asemhobby.co.kr/shopimages/ysacademy/003003000700.jpg?1678433700"
-                alt="issue writer profile image"
-              />
-            ) : (
-              <FaUserCircle />
-            )}
-          </InfoProfile>
-          <span>같이 코딩</span>
-        </InfoBox>
-        <IssueContent>
-          농업생산성의 제고와 농지의 합리적인 이용을 위하거나 불가피한 사정으로
-          발생하는 농지의 임대차와 위탁경영은 법률이 정하는 바에 의하여
-          인정된다. 모든 국민은 인간다운 생활을 할 권리를 가진다. 군인은 현역을
-          면한 후가 아니면 국무위원으로 임명될 수 없다. 혼인과 가족생활은 개인의
-          존엄과 양성의 평등을 기초로 성립되고 유지되어야 하며, 국가는 이를
-          보장한다.보장한다.보장한다.보장한다.보장한다.보장한다.보장한다.보장한다.보장한다.보장한다.보장한다.보장한
-        </IssueContent>
-      </IssueContainer>
+      {issueReply
+        ? issueReply.map((issueReply) => {
+            return (
+              <IssueContainer
+                key={issueReply._id}
+                isAdmin={issueReply.authorType === "true"}
+              >
+                <InfoBox>
+                  <InfoProfile>
+                    {issueReply.ownerProfileUrl ? (
+                      <img
+                        src={issueReply.ownerProfileUrl}
+                        alt="issue writer profile image"
+                      />
+                    ) : (
+                      <FaUserCircle />
+                    )}
+                  </InfoProfile>
+                  <span>{issueReply.ownerNickname}</span>
+                </InfoBox>
+                <IssueContent
+                  dangerouslySetInnerHTML={{
+                    __html: DOMpurify.sanitize(issueReply.content),
+                  }}
+                />
+              </IssueContainer>
+            );
+          })
+        : null}
     </Wrapper>
   );
 }

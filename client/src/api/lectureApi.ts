@@ -181,6 +181,37 @@ export const postIssue = async (data: FormData) => {
     url: `${BASE_URL}/lectures/issues`,
     method: "POST",
     data,
+    params: {
+      directory: "issues",
+    },
+    withCredentials: true,
+  });
+};
+
+export const getIssue = async (subLectureId: string) => {
+  return await axios({
+    url: `${BASE_URL}/lectures/get-issues`,
+    method: "GET",
+    params: {
+      subLectureId,
+    },
+    withCredentials: true,
+  }).then((result) => result.data.issue);
+};
+interface IssueReplyProps {
+  content: string;
+  issueId: string;
+}
+export const postIssueReply = async (data: IssueReplyProps) => {
+  return await axios({
+    url: `${BASE_URL}/lectures/reply-issues`,
+    method: "POST",
+    params: {
+      issueId: data.issueId,
+    },
+    data: {
+      content: data.content,
+    },
     withCredentials: true,
   });
 };

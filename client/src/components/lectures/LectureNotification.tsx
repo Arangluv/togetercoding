@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { subLectureListState } from "../../atom/atoms";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-
+import DOMPurify from "dompurify";
 const Wrapper = styled.article`
   width: 100%;
   height: auto;
@@ -55,7 +55,9 @@ export default function LectureNotification() {
   }, [lectureId]);
   return lectureNoti !== "<p><br/></p>" ? (
     <Wrapper>
-      <NotiContainer dangerouslySetInnerHTML={{ __html: lectureNoti }} />
+      <NotiContainer
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(lectureNoti) }}
+      />
     </Wrapper>
   ) : null;
 }

@@ -4,12 +4,15 @@ import {
   deleteSubLecture,
   getAllLecture,
   getComment,
+  getIssue,
   getLectureList,
   getLectureTitle,
   getListenLecture,
   getMainLecture,
   getSubLecture,
   postComment,
+  postIssue,
+  postIssueReply,
   postMakeLecture,
   postMakeMainTheme,
   postMakeSubTheme,
@@ -70,5 +73,10 @@ lectureRouter.route("/lecture-list").get(getLectureList);
 lectureRouter.route("/complete-lecture").put(putLectureComplete);
 lectureRouter.route("/comments").post(postComment);
 lectureRouter.route("/std-comments").get(getComment);
-lectureRouter.route("/reply").post(postReply)
+lectureRouter.route("/reply").post(postReply);
+lectureRouter
+  .route("/issues")
+  .post(imageUploader.single("referenceImage"), postIssue);
+lectureRouter.route("/get-issues").get(getIssue);
+lectureRouter.route("/reply-issues").post(postIssueReply);
 export default lectureRouter;

@@ -8,6 +8,8 @@ import fs from "fs";
 import path from "path";
 import Note from "../models/Note";
 import Reply from "../models/Reply";
+import Issue from "../models/Issue";
+import IssueReply from "../models/IssueReply";
 AWS.config.update({
   region: process.env.AWS_S3_REGION,
   accessKeyId: process.env.AWS_S3_ACCESS_KEY,
@@ -724,8 +726,6 @@ export const postReply = async (req, res) => {
     // 댓글을 단 사람의 admin check
     let stdType = null;
     const student = await Student.findById(studentId);
-    console.log("student");
-    console.log(student);
     if (
       student.email === "arang@togethercoding.com" &&
       student.nickname === "같이코딩"
@@ -743,6 +743,104 @@ export const postReply = async (req, res) => {
     });
     await Note.updateOne({ _id: commentId }, { $push: { reply: reply._id } });
 
+    return res.status(200).send();
+  } catch (error) {
+    console.log(error);
+    return res.status(404).send();
+  }
+};
+
+export const postIssue = async (req, res) => {
+  try {
+    const { title, content, subLectureId } = req.body;
+    if (!req.session) {
+      throw new Error("이슈를 생성하는데 문제가 발생했습니다");
+    }
+    const { id } = req.session.user;
+    const issuer = await Student.findById(id);
+    if (!issuer) {
+      throw new Error("이슈를 생성하는데 문제가 발생했습니다");
+    }
+    const { nickname, profileImg } = issuer;
+
+    const createdIssue = await Issue.create({
+      owner: id,
+      ownerProfileUrl: profileImg,
+      ownerNickname: nickname,
+      subLectureId,
+      title,
+      content,
+      referenceImg: req.file ? req.file.location : "",
+    });
+
+    // 만들어진 issue의 id를 sublecture에 push
+    await SubLecture.updateOne(
+      { _id: subLectureId },
+      { $push: { issue: createdIssue._id } }
+    );
+    return res.status(200).send();
+  } catch (error) {
+    console.log(error);
+    return res.status(404).send();
+  }
+};
+
+export const getIssue = async (req, res) => {
+  try {
+    const { subLectureId } = req.query;
+    const { issue } = await SubLecture.findById(subLectureId).populate({
+      path: "issue",
+      populate: {
+        path: "issueReply",
+        Model: "IssueReply",
+      },
+    });
+    // const { issue } = await SubLecture.findById(subLectureId).populate("issue");
+    // console.log(issue);
+    return res.status(200).json({ issue });
+  } catch (error) {
+    console.log(error);
+    return res.status(404).send();
+  }
+};
+
+export const postIssueReply = async (req, res) => {
+  try {
+    const { content } = req.body;
+    const { issueId } = req.query;
+    const studentId = req.session.user.id;
+    if (!req.session) {
+      throw new Error("세션이 만료되었습니다");
+    }
+    let isAdmin = false;
+
+    const student = await Student.findById(studentId);
+    if (!student) {
+      throw new Error("올바른 요청이 아닙니다");
+    }
+
+    // admin check
+    console.log(student);
+    console.log(process.env.ADMIN_NAME);
+    console.log(process.env.ADMIN_EMAIL);
+
+    if (
+      student.name === process.env.ADMIN_NAME &&
+      student.email === process.env.ADMIN_EMAIL
+    ) {
+      isAdmin = true;
+    }
+    const issueReply = await IssueReply.create({
+      owner: student._id,
+      ownerProfileUrl: student.profileImg,
+      ownerNickname: student.nickname,
+      authorType: isAdmin,
+      content,
+    });
+    await Issue.updateOne(
+      { _id: issueId },
+      { $push: { issueReply: issueReply._id }, responseState: true }
+    );
     return res.status(200).send();
   } catch (error) {
     console.log(error);

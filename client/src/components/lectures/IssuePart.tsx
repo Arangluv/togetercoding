@@ -9,6 +9,9 @@ import MuiAccordionDetails from "@mui/material/AccordionDetails";
 import Typography from "@mui/material/Typography";
 import IssueItemContainer from "./IssueItemContainer";
 import IssueTitle from "./IssueTitle";
+import { useLocation } from "react-router-dom";
+import { useGetIssueQuery } from "../../hooks/lecture";
+import NoIssueAlarm from "./NoIssueAlarm";
 
 const Accordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -46,8 +49,24 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 }));
 
 export default function IssuePart() {
+  const subLectureId = useLocation().pathname.split("/")[3];
+  const issueData = useGetIssueQuery(subLectureId);
+  // interface IssueProps {
+  //   _id: string;
+  //   owner: string;
+  //   ownerProfileUrl: null | string;
+  //   ownerNickname: string;
+  //   title: string;
+  //   subLectureId: string;
+  //   responseState: false;
+  //   content: string;
+  //   referenceImg: string | null;
+  //   createdAt: string;
+  //   issueReply: [];
+  // }
+  console.log("issueData");
+  console.log(issueData);
   const [expanded, setExpanded] = React.useState<string | false>("panel1");
-
   const handleChange =
     (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
       setExpanded(newExpanded ? panel : false);
@@ -55,66 +74,46 @@ export default function IssuePart() {
 
   return (
     <div style={{ width: "100%", padding: "1vw" }}>
-      <Accordion
-        expanded={expanded === "panel1"}
-        onChange={handleChange("panel1")}
-      >
-        <AccordionSummary
-          aria-controls="panel1d-content"
-          id="panel1d-header"
-          sx={{
-            "& .MuiSvgIcon-root": {
-              color: "#C2C9D1",
-            },
-          }}
-        >
-          <Typography sx={{ width: "100%" }}>
-            <IssueTitle />
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <IssueItemContainer></IssueItemContainer>
-          {/* <Typography>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            malesuada lacus ex, sit amet blandit leo lobortis eget. Lorem ipsum
-            dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada
-            lacus ex, sit amet blandit leo lobortis eget.
-          </Typography> */}
-        </AccordionDetails>
-      </Accordion>
-
-      <Accordion
-        expanded={expanded === "panel2"}
-        onChange={handleChange("panel2")}
-      >
-        <AccordionSummary aria-controls="panel2d-content" id="panel2d-header">
-          <Typography>Collapsible Group Item #2</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            malesuada lacus ex, sit amet blandit leo lobortis eget. Lorem ipsum
-            dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada
-            lacus ex, sit amet blandit leo lobortis eget.
-          </Typography>
-        </AccordionDetails>
-      </Accordion>
-      <Accordion
-        expanded={expanded === "panel3"}
-        onChange={handleChange("panel3")}
-      >
-        <AccordionSummary aria-controls="panel3d-content" id="panel3d-header">
-          <Typography>Collapsible Group Item #3</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            malesuada lacus ex, sit amet blandit leo lobortis eget. Lorem ipsum
-            dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada
-            lacus ex, sit amet blandit leo lobortis eget.
-          </Typography>
-        </AccordionDetails>
-      </Accordion>
+      {issueData?.length ? (
+        issueData?.map((issue) => {
+          return (
+            <Accordion
+              expanded={expanded === issue._id}
+              onChange={handleChange(issue._id)}
+              key={issue._id}
+            >
+              <AccordionSummary
+                aria-controls="panel1d-content"
+                id="panel1d-header"
+                sx={{
+                  "& .MuiSvgIcon-root": {
+                    color: "#C2C9D1",
+                  },
+                }}
+              >
+                <Typography sx={{ width: "100%" }}>
+                  <IssueTitle
+                    title={issue.title}
+                    responseState={issue.responseState}
+                  />
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <IssueItemContainer
+                  _id={issue._id}
+                  ownerNickname={issue.ownerNickname}
+                  ownerProfileUrl={issue.ownerProfileUrl}
+                  content={issue.content}
+                  referenceImg={issue.referenceImg}
+                  issueReply={issue.issueReply}
+                ></IssueItemContainer>
+              </AccordionDetails>
+            </Accordion>
+          );
+        })
+      ) : (
+        <NoIssueAlarm />
+      )}
     </div>
   );
 }
