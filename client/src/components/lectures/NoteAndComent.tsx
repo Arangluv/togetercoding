@@ -11,6 +11,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRecoilValue } from "recoil";
 import { studentLoginState } from "../../atom/atoms";
 import { FaUserCircle } from "react-icons/fa";
+import Moment from "react-moment";
 const Wrapper = styled.div`
   width: 100%;
   min-height: 20vh;
@@ -36,6 +37,11 @@ const NoteProfileSubContainer = styled.div`
     width: 100%;
     height: 100%;
     border-radius: 100%;
+  }
+  svg {
+    width: 100%;
+    height: 100%;
+    color: ${(props) => props.theme.textColor};
   }
 `;
 const NoteContentContainer = styled.div`
@@ -268,6 +274,23 @@ export default function NoteAndComent() {
     subLectureId,
     queryClient,
   });
+  const detailDate = (createdAt: any) => {
+    const milliSeconds = new Date().valueOf() - createdAt;
+    const seconds = milliSeconds / 1000;
+    if (seconds < 60) return `방금 전`;
+    const minutes = seconds / 60;
+    if (minutes < 60) return `${Math.floor(minutes)}분 전`;
+    const hours = minutes / 60;
+    if (hours < 24) return `${Math.floor(hours)}시간 전`;
+    const days = hours / 24;
+    if (days < 7) return `${Math.floor(days)}일 전`;
+    const weeks = days / 7;
+    if (weeks < 5) return `${Math.floor(weeks)}주 전`;
+    const months = days / 30;
+    if (months < 12) return `${Math.floor(months)}개월 전`;
+    const years = days / 365;
+    return `${Math.floor(years)}년 전`;
+  };
   const handleWriteReplyClick = (commentId: string) => {
     // 일단은 아무 string으로 set
     if (writeReply === commentId) {
@@ -282,6 +305,19 @@ export default function NoteAndComent() {
     }
     replyMutate({ content: data.content, commentId: writeReply });
   };
+  // const displayCreatedAt = () => {
+  //   let startTime = new Date();
+  //   let nowTime = Date.now();
+  //   if (parseInt(startTime - nowTime) > -60000) {
+  //     return <Moment format="방금 전">{startTime}</Moment>;
+  //   }
+  //   if (parseInt(startTime - nowTime) < -86400000) {
+  //     return <Moment format="MMM D일">{startTime}</Moment>;
+  //   }
+  //   if (parseInt(startTime - nowTime) > -86400000) {
+  //     return <Moment fromNow>{startTime}</Moment>;
+  //   }
+  // };
   return (
     <Wrapper>
       {lectureCommentData?.comment?.length ? (
@@ -290,16 +326,21 @@ export default function NoteAndComent() {
             <NoteContainer key={comment._id}>
               <NoteProfileImageContainer>
                 <NoteProfileSubContainer>
-                  <img
-                    src={comment.ownerProfileUrl}
-                    alt="student comment profile image"
-                  />
+                  {comment.ownerProfileUrl ? (
+                    <img
+                      src={comment.ownerProfileUrl}
+                      alt="student comment profile image"
+                    />
+                  ) : (
+                    <FaUserCircle />
+                  )}
                 </NoteProfileSubContainer>
               </NoteProfileImageContainer>
               <NoteContentContainer>
                 <NoteProfileInfo>
                   <span>{comment.ownerNickname}</span>
-                  <small>{comment.createAt}</small>
+                  <small>{detailDate(new Date(comment.createdAt))}</small>
+                  {/* <Moment fromNow>{comment.createAt}</Moment> */}
                 </NoteProfileInfo>
                 <NoteContent>
                   <p>{comment.content}</p>
@@ -350,7 +391,7 @@ export default function NoteAndComent() {
                 {comment.reply
                   ? comment.reply.map((reply) => {
                       return (
-                        <ReplyContainer>
+                        <ReplyContainer key={reply._id}>
                           {reply.ownerProfileUrl ? (
                             <ReplyProfileContainer>
                               <img
@@ -369,7 +410,9 @@ export default function NoteAndComent() {
                                 <BsFillReplyFill />
                                 {reply.ownerNickname}
                               </span>
-                              <small>{reply.createdAt}</small>
+                              <small>
+                                {detailDate(new Date(reply.createdAt))}
+                              </small>
                             </ReplyInfoContainer>
                             <ReplyContent>
                               <p>{reply.content}</p>

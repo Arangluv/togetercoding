@@ -1,8 +1,8 @@
 import styled from "styled-components";
-import { RiQuestionnaireFill } from "react-icons/ri";
+import { PiWarningCircle } from "react-icons/pi";
 const Wrapper = styled.div`
   width: 100%;
-  height: 5vw;
+  height: 6vw;
   margin-bottom: 1.5vw;
   border-radius: 10px;
   background-color: rgba(99, 110, 114, 0.5);
@@ -23,17 +23,20 @@ const IssueContent = styled.div`
 const IssueTitle = styled.div`
   width: 90%;
   padding: 1vw 0;
-  overflow: scroll;
+  display: flex;
+  align-items: center;
   /* display: flex; */
-  h3 {
+  span {
     display: flex;
     align-items: center;
     color: #ecf0f1;
     font-size: 1.2vw;
+    line-height: 1.6;
+    width: 90%;
   }
   svg {
-    margin-right: 0.5vw;
-    color: #ecf0f1;
+    margin-right: 1vw;
+    color: ${(props) => props.theme.successColor};
     width: 1.5vw;
     height: 1.5vw;
   }
@@ -59,10 +62,11 @@ export default function IssueNote() {
     <Wrapper>
       <IssueContent>
         <IssueTitle>
-          <h3>
-            <RiQuestionnaireFill />왜 이건 이렇게 되고 저건 저렇게 될까요 ??
-            정말로 너무 궁금해요
-          </h3>
+          <PiWarningCircle />
+          <span>
+            왜 이건 이렇게 되고 저건 저렇게 될까요 ?? 정말로 너무 궁금해요 왜
+            이건 이렇게 되고 저건 저렇게 될까요 ?? 정말로 너무 궁금해요
+          </span>
         </IssueTitle>
         <IssueState>
           <PendingSpan>대기중</PendingSpan>

@@ -101,7 +101,10 @@ export default function AccordionLecture() {
       {lectureList
         ? lectureList.map((mainLecture) => {
             return (
-              <Accordion expanded={chapters.includes(mainLecture.name)}>
+              <Accordion
+                key={mainLecture._id}
+                expanded={chapters.includes(mainLecture.name)}
+              >
                 <AccordionSummary
                   onClick={() => handleClick(mainLecture.name)}
                   expandIcon={<ExpandMoreIcon />}
@@ -120,6 +123,7 @@ export default function AccordionLecture() {
                     lectureCount = lectureCount + 1;
                     return (
                       <LectureCurriculumsItem
+                        key={subLecture._id}
                         name={subLecture.name}
                         lectureId={subLecture._id}
                         isTaken={subLectureList[lectureCount - 1].isTaken}

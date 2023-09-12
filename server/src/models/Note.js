@@ -11,6 +11,7 @@ const noteSchema = new mongoose.Schema({
   subLectureId: { type: mongoose.Schema.Types.ObjectId, ref: "SubLecture" },
   content: { type: String },
   createdAt: { type: Date, default: date },
+  urlName: { type: String, default: "" },
   reply: [{ type: mongoose.Schema.Types.ObjectId, ref: "Reply" }],
 });
 

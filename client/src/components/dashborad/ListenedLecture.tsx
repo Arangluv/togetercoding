@@ -95,7 +95,7 @@ export default function ListenedLecture({
         <ProgressBar progressState={progressState}>
           <div></div>
         </ProgressBar>
-        <span>{`${progressState}% 완료`}</span>
+        <span>{`${(Number(progressState) * 100).toFixed(0)}% 완료`}</span>
       </LectureProgressContainer>
     </Wrapper>
   );

@@ -666,7 +666,7 @@ export const putLectureComplete = async (req, res) => {
 };
 
 export const postComment = async (req, res) => {
-  const { content, subLectureId } = req.body;
+  const { content, subLectureId, urlName } = req.body;
   try {
     if (!req.session) {
       throw new Error("사용자 세션이 없습니다");
@@ -686,6 +686,7 @@ export const postComment = async (req, res) => {
       ownerNickname: commentOwner.nickname,
       subLectureId,
       content,
+      urlName: `${urlName}/lectures/${subLectureId}`,
     });
     await SubLecture.updateOne(
       { _id: subLectureId },
@@ -703,15 +704,18 @@ export const getComment = async (req, res) => {
     const { subLectureId } = req.query;
     const subLecture = await SubLecture.findById(subLectureId).populate({
       path: "studentNote",
+      options: { sort: { createdAt: -1 } },
       populate: {
         path: "reply",
         Model: "Reply",
+        options: { sort: { createdAt: 1 } },
       },
     });
     if (!subLecture) {
       throw new Error("코멘트를 찾는데 문제가 발생했습니다");
     }
     const { studentNote } = subLecture;
+
     return res.status(200).json({ comment: studentNote });
   } catch (error) {
     console.log(error);
@@ -752,7 +756,7 @@ export const postReply = async (req, res) => {
 
 export const postIssue = async (req, res) => {
   try {
-    const { title, content, subLectureId } = req.body;
+    const { title, content, subLectureId, urlName } = req.body;
     if (!req.session) {
       throw new Error("이슈를 생성하는데 문제가 발생했습니다");
     }
@@ -770,6 +774,7 @@ export const postIssue = async (req, res) => {
       subLectureId,
       title,
       content,
+      urlName: `${urlName}/lectures/${subLectureId}`,
       referenceImg: req.file ? req.file.location : "",
     });
 
@@ -788,13 +793,15 @@ export const postIssue = async (req, res) => {
 export const getIssue = async (req, res) => {
   try {
     const { subLectureId } = req.query;
-    const { issue } = await SubLecture.findById(subLectureId).populate({
-      path: "issue",
-      populate: {
-        path: "issueReply",
-        Model: "IssueReply",
-      },
-    });
+    const { issue } = await SubLecture.findById(subLectureId)
+      .sort({ createdAt: 1 })
+      .populate({
+        path: "issue",
+        populate: {
+          path: "issueReply",
+          Model: "IssueReply",
+        },
+      });
     // const { issue } = await SubLecture.findById(subLectureId).populate("issue");
     // console.log(issue);
     return res.status(200).json({ issue });

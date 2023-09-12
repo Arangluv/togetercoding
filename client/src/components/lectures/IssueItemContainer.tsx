@@ -177,9 +177,9 @@ export default function IssueItemContainer({
   const queryClient = useQueryClient();
   const subLectureId = useLocation().pathname.split("/")[3];
   const stdLoginState = useRecoilValue(studentLoginState);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [value, setValue] = useState(""); // 빈 경우는 <p><br></p> 경우도 존재;
   const [replyState, setReplyState] = useState<null | string>(null);
+  const [canReply, setCanReply] = useState(false);
   const postReplyMutate = usePostIssueReplyMutation({
     queryClient,
     subLectureId,
@@ -198,17 +198,27 @@ export default function IssueItemContainer({
     }
     setReplyState(null);
   };
+  // 댓글에 대해 한번 생각해보자
+  // 일단 처음은 admin만
+  // 대댓글부터 issue를 유저가 달 수 있다.
+  // 단 본인이 직접 쓴글에만!
+
   useEffect(() => {
     if (
       process.env.REACT_APP_ADMIN_EMAIL == stdLoginState.email &&
       process.env.REACT_APP_ADMIN_USERNAME === stdLoginState.username
     ) {
-      setIsAdmin(true);
+      setCanReply(true);
+      return;
+    }
+    if (stdLoginState.nickname === ownerNickname) {
+      setCanReply(true);
       return;
     }
     return;
   }, [stdLoginState]);
   const onValid = () => {
+    console.log("실행");
     if (value === "") {
       setError("extraError", { message: "답글내용을 입력해주세요" });
       return;
@@ -231,7 +241,7 @@ export default function IssueItemContainer({
             )}
           </InfoProfile>
           <span>{ownerNickname}</span>
-          {isAdmin ? (
+          {canReply ? (
             <IssueReply onClick={() => handleIssueReplyClick(_id)}>
               답글달기
             </IssueReply>
@@ -246,7 +256,35 @@ export default function IssueItemContainer({
           </IssueImage>
         ) : null}
       </IssueContainer>
-
+      {issueReply
+        ? issueReply.map((issueReply) => {
+            return (
+              <IssueContainer
+                key={issueReply._id}
+                isAdmin={issueReply.authorType === "true"}
+              >
+                <InfoBox>
+                  <InfoProfile>
+                    {issueReply.ownerProfileUrl ? (
+                      <img
+                        src={issueReply.ownerProfileUrl}
+                        alt="issue writer profile image"
+                      />
+                    ) : (
+                      <FaUserCircle />
+                    )}
+                  </InfoProfile>
+                  <span>{issueReply.ownerNickname}</span>
+                </InfoBox>
+                <IssueContent
+                  dangerouslySetInnerHTML={{
+                    __html: DOMpurify.sanitize(issueReply.content),
+                  }}
+                />
+              </IssueContainer>
+            );
+          })
+        : null}
       {replyState ? (
         <IssueReplyForm onSubmit={handleSubmit(onValid)}>
           <InfoBox>
@@ -298,39 +336,15 @@ export default function IssueItemContainer({
           </QuillWrapper>
           <SubmitLabel htmlFor="issue_reply_submit">
             <input id="issue_reply_submit" type="submit" />
-            <span>답변달기</span>
+            <span>
+              답변달기
+              {formState.errors.extraError ? (
+                <small>{formState.errors.extraError.message}</small>
+              ) : null}
+            </span>
           </SubmitLabel>
         </IssueReplyForm>
       ) : null}
-      {issueReply
-        ? issueReply.map((issueReply) => {
-            return (
-              <IssueContainer
-                key={issueReply._id}
-                isAdmin={issueReply.authorType === "true"}
-              >
-                <InfoBox>
-                  <InfoProfile>
-                    {issueReply.ownerProfileUrl ? (
-                      <img
-                        src={issueReply.ownerProfileUrl}
-                        alt="issue writer profile image"
-                      />
-                    ) : (
-                      <FaUserCircle />
-                    )}
-                  </InfoProfile>
-                  <span>{issueReply.ownerNickname}</span>
-                </InfoBox>
-                <IssueContent
-                  dangerouslySetInnerHTML={{
-                    __html: DOMpurify.sanitize(issueReply.content),
-                  }}
-                />
-              </IssueContainer>
-            );
-          })
-        : null}
     </Wrapper>
   );
 }

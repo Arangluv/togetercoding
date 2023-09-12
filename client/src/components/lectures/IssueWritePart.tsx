@@ -145,6 +145,7 @@ interface DProps {
 }
 export default function IssueWritePart() {
   const subLectureId = useLocation().pathname.split("/")[3];
+  const urlName = useLocation().pathname.split("/")[1];
   const queryClient = useQueryClient();
   const [issueContent, setIssueContent] = useState("");
   const [preview, setPreview] = useState("");
@@ -183,6 +184,7 @@ export default function IssueWritePart() {
     formData.append("title", data.title);
     formData.append("content", data.content);
     formData.append("subLectureId", subLectureId);
+    formData.append("urlName", urlName);
     if (issueContent === "" || issueContent === "<p><br/></p>") {
       setError("content", { message: "이슈 내용을 적어주세요" });
       return;

@@ -5,13 +5,8 @@ import CompleteLecture from "./CompleteLecture";
 import LectureNotification from "./LectureNotification";
 import TypingType from "./TypingType";
 import NotePart from "./NotePart";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import {
-  commentState,
-  lectureListState,
-  noteState,
-  studentMainTheme,
-} from "../../atom/atoms";
+import { useRecoilValue } from "recoil";
+import { commentState, noteState } from "../../atom/atoms";
 import NoteAndComent from "./NoteAndComent";
 import IssuePart from "./IssuePart";
 import { useLocation } from "react-router-dom";
@@ -21,9 +16,8 @@ import IssueWritePart from "./IssueWritePart";
 
 const Wrapper = styled.div`
   width: 75%;
-  height: auto;
+  height: 100vh;
   overflow-y: scroll;
-  background-color: #222f3e;
   padding-bottom: 10vh;
   position: absolute;
   left: 25%;
@@ -32,17 +26,10 @@ const Wrapper = styled.div`
 export default function LectureScreen() {
   const noteActive = useRecoilValue(noteState);
   const comment = useRecoilValue(commentState);
-  const lectureData = useRecoilValue(lectureListState);
   const lectureId = useLocation().pathname.split("/")[3];
-  const mainTheme = useRecoilValue(studentMainTheme);
 
-  // CASE가 3가지임
-  // URL로 direct로 들어온경우 -> mainTheme null 찾기 어려움
-  // 클릭해서 넘어간 경우 -> mainTheme존재
-  // next or pre 버튼 -> mainTheme 뭔지 모름
   useEffect(() => {
     window.scrollTo(0, 0);
-    console.log("실행완료");
   }, [lectureId]);
   return (
     <Wrapper>

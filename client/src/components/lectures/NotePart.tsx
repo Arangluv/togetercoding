@@ -169,7 +169,9 @@ export default function NotePart() {
     watch,
     setValue,
   } = useForm<DProps>();
-  const subLectureId = useLocation().pathname.split("/")[3];
+  const location = useLocation();
+  const subLectureId = location.pathname.split("/")[3];
+  const urlName = location.pathname.split("/")[1];
   const queryClient = useQueryClient();
   const postCommentMutate = usePostCommentMutation({
     setValue,
@@ -183,7 +185,7 @@ export default function NotePart() {
     setProfilePreview(student.profileImg);
   }, [student]);
   const onValid = (data: DProps) => {
-    postCommentMutate({ content: data.content, subLectureId });
+    postCommentMutate({ content: data.content, subLectureId, urlName });
   };
   return (
     <Wrapper>

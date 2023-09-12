@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
 import { subLectureListState } from "../../atom/atoms";
-import { toast } from "react-toastify";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -21,6 +20,14 @@ export default function VedioPart() {
   const lectureId = useLocation().pathname.split("/")[3];
   const [videoUrl, setVideoUrl] = useState("");
   const navigator = useNavigate();
+  const [hasWindow, setHasWindow] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setHasWindow(true);
+    }
+  }, [window]);
+  console.log(window);
   useEffect(() => {
     if (!subLectureList || !lectureId) {
       return;
@@ -32,26 +39,28 @@ export default function VedioPart() {
       return;
     }
     setVideoUrl(subLectureList[findIdx].lectureLink);
-  }, []);
+  }, [subLectureList]);
   return (
     <Wrapper>
       <VedioContainer>
-        <ReactPlayer
-          url={videoUrl}
-          playing={false}
-          muted={true}
-          controls={true}
-          width={"100%"}
-          height={"100%"}
-          config={{
-            file: {
-              attributes: {
-                crossOrigin: "true",
+        {hasWindow && (
+          <ReactPlayer
+            url={videoUrl}
+            playing={false}
+            muted={true}
+            controls={true}
+            width={"100%"}
+            height={"100%"}
+            config={{
+              file: {
+                attributes: {
+                  crossOrigin: "true",
+                },
+                hlsOptions: {},
               },
-              hlsOptions: {},
-            },
-          }}
-        />
+            }}
+          />
+        )}
       </VedioContainer>
     </Wrapper>
   );

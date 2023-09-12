@@ -2,7 +2,7 @@ import Student from "../models/Student";
 import AWS from "aws-sdk";
 import Lecture from "../models/Lecture";
 import Purchase from "../models/Purchase";
-
+import Issue from "../models/Issue";
 AWS.config.update({
   region: process.env.AWS_S3_REGION,
   accessKeyId: process.env.AWS_S3_ACCESS_KEY,
@@ -96,5 +96,19 @@ export const postBuyLecture = async (req, res) => {
     return res
       .status(404)
       .json({ message: "상품을 구매하는데 문제가 발생했습니다" });
+  }
+};
+
+export const getWriteIssue = async (req, res) => {
+  try {
+    if (!req.session) {
+      throw new Error("작성한 이슈를 불러오는데 문제가 발생했습니다");
+    }
+    const { id } = req.session.user;
+    const issues = await Issue.find({ owner: id });
+
+    return res.status(200).json({ issues });
+  } catch (error) {
+    return res.status(404).send();
   }
 };

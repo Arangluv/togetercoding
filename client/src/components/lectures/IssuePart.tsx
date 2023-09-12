@@ -45,27 +45,11 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
 
 const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
   padding: 0,
-  // borderTop: "1px solid rgba(0, 0, 0, .125)",
 }));
 
 export default function IssuePart() {
   const subLectureId = useLocation().pathname.split("/")[3];
   const issueData = useGetIssueQuery(subLectureId);
-  // interface IssueProps {
-  //   _id: string;
-  //   owner: string;
-  //   ownerProfileUrl: null | string;
-  //   ownerNickname: string;
-  //   title: string;
-  //   subLectureId: string;
-  //   responseState: false;
-  //   content: string;
-  //   referenceImg: string | null;
-  //   createdAt: string;
-  //   issueReply: [];
-  // }
-  console.log("issueData");
-  console.log(issueData);
   const [expanded, setExpanded] = React.useState<string | false>("panel1");
   const handleChange =
     (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {

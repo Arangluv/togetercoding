@@ -145,6 +145,7 @@ export const putCompleteLecture = async (data: CompleteLectureProps) => {
 interface CommentProps {
   subLectureId: string;
   content: string;
+  urlName: string;
 }
 export const postLectureComment = async (data: CommentProps) => {
   return await axios({

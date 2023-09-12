@@ -122,3 +122,10 @@ export const lecturePayment = async ({ email, lectureId }: BuyLectureProps) => {
     },
   });
 };
+
+export const getUserIssue = async () => {
+  return await axios({
+    url: `${BASE_URL}/students/issues`,
+    withCredentials: true,
+  }).then((result) => result.data.issues);
+};

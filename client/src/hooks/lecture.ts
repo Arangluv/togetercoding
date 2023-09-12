@@ -21,7 +21,7 @@ import {
 } from "../api/lectureApi";
 import { toast } from "react-toastify";
 import { NavigateFunction } from "react-router-dom";
-import { lecturePayment } from "../api/api";
+import { getUserIssue, lecturePayment } from "../api/api";
 import { UseFormSetValue } from "react-hook-form";
 
 interface LectureItemProps {
@@ -330,7 +330,7 @@ interface GetCommentProps {
 }
 interface CommentProps {
   content: string;
-  createAt: string;
+  createdAt: string;
   owner: string;
   ownerNickname: string;
   ownerProfileUrl: string;
@@ -476,4 +476,14 @@ export const usePostIssueReplyMutation = ({
     },
   });
   return issueReplyMutate;
+};
+
+// DashBoard Part
+interface StudentIssueProps {
+  _id: string;
+  
+}
+export const useGetUserIssueQuery = () => {
+  const { data: userIssueData } = useQuery(["user-issue"], getUserIssue);
+  return userIssueData;
 };
