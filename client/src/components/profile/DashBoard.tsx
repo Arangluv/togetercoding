@@ -3,7 +3,10 @@ import styled from "styled-components";
 import ListenedLecture from "../dashborad/ListenedLecture";
 import IssueNote from "../dashborad/IssueNote";
 import StudyNote from "../dashborad/StudyNote";
-import { useListenLectureQuery } from "../../hooks/lecture";
+import {
+  useGetUserIssueQuery,
+  useListenLectureQuery,
+} from "../../hooks/lecture";
 import { useRecoilValue } from "recoil";
 import { studentLoginState } from "../../atom/atoms";
 
@@ -75,8 +78,8 @@ export default function DashBoard() {
   >("lecture");
   const { email } = useRecoilValue(studentLoginState);
   const listenLectures = useListenLectureQuery({ studentEmail: email });
-  console.log("listenLectures");
-  console.log(listenLectures);
+  const studentIssueData = useGetUserIssueQuery();
+  console.log(studentIssueData);
   //totalLectureQuantity: 1, completeLectureQuantity: 0}
   return (
     <Wrapper>
@@ -122,19 +125,19 @@ export default function DashBoard() {
       ) : null}
       {currentState === "issue" ? (
         <DashBoardIssueBox>
-          <IssueNote />
-          <IssueNote />
-          <IssueNote />
-          <IssueNote />
-          <IssueNote />
-          <IssueNote />
-          <IssueNote />
-          <IssueNote />
-          <IssueNote />
-          <IssueNote />
-          <IssueNote />
-          <IssueNote />
-          <IssueNote />
+          {studentIssueData
+            ? studentIssueData.map((issue) => {
+                return (
+                  <IssueNote
+                    key={issue._id}
+                    responseState={issue.responseState}
+                    title={issue.title}
+                    urlName={issue.urlName}
+                    _id={issue._id}
+                  />
+                );
+              })
+            : null}
         </DashBoardIssueBox>
       ) : null}
       {currentState === "note" ? (

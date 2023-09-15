@@ -24,7 +24,6 @@ const Wrapper = styled.div`
 `;
 
 export default function BasicHtmlCss() {
-  const lectureId = HTML_CSS_BASIC_ID;
   return (
     <Wrapper>
       <Title />
@@ -35,7 +34,7 @@ export default function BasicHtmlCss() {
       <CourseSummary />
       <CourseReview />
       <Curriculum />
-      <CoursePayment lectureId={lectureId} />
+      <CoursePayment />
     </Wrapper>
   );
 }

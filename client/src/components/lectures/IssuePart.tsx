@@ -12,7 +12,9 @@ import IssueTitle from "./IssueTitle";
 import { useLocation } from "react-router-dom";
 import { useGetIssueQuery } from "../../hooks/lecture";
 import NoIssueAlarm from "./NoIssueAlarm";
-
+import { useRecoilState } from "recoil";
+import { panelState } from "../../atom/atoms";
+import { forwardRef } from "react";
 const Accordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
 ))(({ theme }) => ({
@@ -46,23 +48,26 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
 const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
   padding: 0,
 }));
-
-export default function IssuePart() {
+const IssuePart = React.forwardRef<HTMLDivElement>((props, ref) => {
   const subLectureId = useLocation().pathname.split("/")[3];
   const issueData = useGetIssueQuery(subLectureId);
-  const [expanded, setExpanded] = React.useState<string | false>("panel1");
+  const [panel, setPanel] = useRecoilState(panelState);
   const handleChange =
-    (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
-      setExpanded(newExpanded ? panel : false);
+    (inputPanel: string) =>
+    (event: React.SyntheticEvent, newExpanded: boolean) => {
+      setPanel(newExpanded ? inputPanel : false);
     };
 
   return (
-    <div style={{ width: "100%", padding: "1vw" }}>
-      {issueData?.length ? (
+    <div
+      style={{ width: "100%", padding: "1vw", border: "3px solid red" }}
+      ref={ref}
+    >
+      {/* {issueData?.length ? (
         issueData?.map((issue) => {
           return (
             <Accordion
-              expanded={expanded === issue._id}
+              expanded={panel === issue._id}
               onChange={handleChange(issue._id)}
               key={issue._id}
             >
@@ -97,7 +102,9 @@ export default function IssuePart() {
         })
       ) : (
         <NoIssueAlarm />
-      )}
+      )} */}
     </div>
   );
-}
+});
+
+export default IssuePart;

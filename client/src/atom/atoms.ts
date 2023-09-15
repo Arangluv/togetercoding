@@ -85,3 +85,8 @@ export const subLectureListWithUpdatedIsTaken = selector({
     set(subLectureListState, newValue);
   },
 });
+
+export const panelState = atom<string | boolean>({
+  key: "panelState",
+  default: "",
+});

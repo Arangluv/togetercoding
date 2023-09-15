@@ -61,7 +61,7 @@ export const postBuyLecture = async (req, res) => {
     if (!req.session) {
       return res.status(404).send();
     }
-    const { email, lectureId } = req.body;
+    const { email, lectureName } = req.body;
 
     // req.session.user => user: { id: '64bf7bde52ce694ab1eef4a0', name: '류현수', authorized: true }
     const buyer = await Student.findOne({
@@ -72,9 +72,9 @@ export const postBuyLecture = async (req, res) => {
     if (!buyer) {
       return res.status(404).send();
     }
-    const lecture = await Lecture.findOne({ _id: lectureId });
+    const lecture = await Lecture.findOne({ urlName: lectureName });
+
     if (!lecture) {
-      console.log("야기?");
       return res.status(404).send();
     }
 
@@ -106,9 +106,9 @@ export const getWriteIssue = async (req, res) => {
     }
     const { id } = req.session.user;
     const issues = await Issue.find({ owner: id });
-
     return res.status(200).json({ issues });
   } catch (error) {
+    console.log(error);
     return res.status(404).send();
   }
 };

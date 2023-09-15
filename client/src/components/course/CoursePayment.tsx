@@ -3,6 +3,7 @@ import { AiOutlineArrowRight } from "react-icons/ai";
 import { useLecturePaymentMutataion } from "../../hooks/lecture";
 import { useRecoilValue } from "recoil";
 import { studentLoginState } from "../../atom/atoms";
+import { useLocation } from "react-router-dom";
 const Wrapper = styled.div`
   width: 100%;
   min-height: 20vh;
@@ -124,9 +125,11 @@ const ApplayBtn = styled.button`
 interface IProps {
   lectureId: string;
 }
-export default function CoursePayment({ lectureId }: IProps) {
+export default function CoursePayment() {
   const { lecturePaymentMutate, paymentLoading } = useLecturePaymentMutataion();
   const { email } = useRecoilValue(studentLoginState);
+  const lectureName = useLocation().pathname.split("/")[1];
+  console.log(lectureName);
   console.log("paymentLoading");
   console.log(paymentLoading);
   return (
@@ -148,7 +151,7 @@ export default function CoursePayment({ lectureId }: IProps) {
           </PaymentFirstItem>
           <PaymentLastItem>
             <ApplayBtn
-              onClick={() => lecturePaymentMutate({ email, lectureId })}
+              onClick={() => lecturePaymentMutate({ email, lectureName })}
             >
               수강신청하기
             </ApplayBtn>

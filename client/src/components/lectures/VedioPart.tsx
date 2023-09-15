@@ -27,7 +27,7 @@ export default function VedioPart() {
       setHasWindow(true);
     }
   }, [window]);
-  console.log(window);
+
   useEffect(() => {
     if (!subLectureList || !lectureId) {
       return;
@@ -39,7 +39,7 @@ export default function VedioPart() {
       return;
     }
     setVideoUrl(subLectureList[findIdx].lectureLink);
-  }, [subLectureList]);
+  }, [subLectureList, lectureId]);
   return (
     <Wrapper>
       <VedioContainer>

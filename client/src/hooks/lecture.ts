@@ -481,9 +481,14 @@ export const usePostIssueReplyMutation = ({
 // DashBoard Part
 interface StudentIssueProps {
   _id: string;
-  
+  responseState: boolean;
+  urlName: string;
+  title: string;
 }
 export const useGetUserIssueQuery = () => {
-  const { data: userIssueData } = useQuery(["user-issue"], getUserIssue);
+  const { data: userIssueData } = useQuery<StudentIssueProps[]>(
+    ["user-issue"],
+    getUserIssue
+  );
   return userIssueData;
 };

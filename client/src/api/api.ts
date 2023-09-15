@@ -18,7 +18,7 @@ interface KakaoLoginData {
 }
 interface BuyLectureProps {
   email: string;
-  lectureId: string;
+  lectureName: string;
 }
 export const studentJoin = async (data: JoinData) => {
   return axios({
@@ -107,7 +107,10 @@ export const profileChange = async (data: FormData) => {
   });
 };
 
-export const lecturePayment = async ({ email, lectureId }: BuyLectureProps) => {
+export const lecturePayment = async ({
+  email,
+  lectureName,
+}: BuyLectureProps) => {
   return await axios({
     url: `${BASE_URL}/students/buy-lectures`,
     method: "POST",
@@ -118,7 +121,7 @@ export const lecturePayment = async ({ email, lectureId }: BuyLectureProps) => {
     },
     data: {
       email,
-      lectureId,
+      lectureName,
     },
   });
 };

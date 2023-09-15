@@ -5,13 +5,13 @@ import CompleteLecture from "./CompleteLecture";
 import LectureNotification from "./LectureNotification";
 import TypingType from "./TypingType";
 import NotePart from "./NotePart";
-import { useRecoilValue } from "recoil";
-import { commentState, noteState } from "../../atom/atoms";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { commentState, noteState, panelState } from "../../atom/atoms";
 import NoteAndComent from "./NoteAndComent";
 import IssuePart from "./IssuePart";
 import { useLocation } from "react-router-dom";
 import GithubUrlPart from "./GithubUrlPart";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import IssueWritePart from "./IssueWritePart";
 
 const Wrapper = styled.div`
@@ -21,16 +21,34 @@ const Wrapper = styled.div`
   padding-bottom: 10vh;
   position: absolute;
   left: 25%;
+  border: 3px solid blue;
 `;
 
 export default function LectureScreen() {
   const noteActive = useRecoilValue(noteState);
-  const comment = useRecoilValue(commentState);
+  const [comment, setComment] = useRecoilState(commentState);
+  const setPanel = useSetRecoilState(panelState);
   const lectureId = useLocation().pathname.split("/")[3];
-
+  const location = useLocation();
+  const ref = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [lectureId]);
+    console.log("ref 몇번 시작?");
+    console.log(ref.current);
+    console.log("location");
+    console.log(location);
+    if (!location?.state) {
+      return;
+    }
+    // 사용자가 이슈를 눌러서 왔다
+    setComment("issue");
+    setPanel(location.state._id);
+    if (!ref?.current) {
+      console.log("ref 동작안함");
+      console.log(ref);
+      console.log(ref);
+    }
+    ref?.current?.scrollIntoView({ behavior: "smooth" });
+  }, [location, ref]);
   return (
     <Wrapper>
       <LectureHeader />
@@ -44,7 +62,7 @@ export default function LectureScreen() {
       ) : noteActive === "issueWrite" ? (
         <IssueWritePart />
       ) : null}
-      {comment === "note" ? <NoteAndComent /> : <IssuePart />}
+      {comment === "note" ? <NoteAndComent /> : <IssuePart ref={ref} />}
     </Wrapper>
   );
 }

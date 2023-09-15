@@ -319,11 +319,9 @@ const readFolder = () => {
                     console.error("Error uploading:", s3Err);
                   } else {
                     // data.key : test/1690959575920-sample-mp4-file.mp48.ts
-                    console.log("data key?");
-                    console.log(data.key);
-                    const deleteEncodeFileName = data.key.split("/")[2];
+                    const deleteEncodeFileName = data.Key.split("/")[2];
 
-                    if (data.key.split(".")[1] === "m3u8") {
+                    if (deleteEncodeFileName.split(".")[1] === "m3u8") {
                       location = data.Location;
                       resolve(location);
                     }

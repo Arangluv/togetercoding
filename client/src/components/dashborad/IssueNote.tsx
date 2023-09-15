@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { PiWarningCircle } from "react-icons/pi";
+import { useNavigate } from "react-router-dom";
 const Wrapper = styled.div`
   width: 100%;
   height: 6vw;
@@ -26,7 +27,7 @@ const IssueTitle = styled.div`
   display: flex;
   align-items: center;
   /* display: flex; */
-  span {
+  h3 {
     display: flex;
     align-items: center;
     color: #ecf0f1;
@@ -57,20 +58,37 @@ const CompleteSpan = styled.span`
   color: #03b954;
   font-weight: 600;
 `;
-export default function IssueNote() {
+interface IProps {
+  responseState: boolean;
+  urlName: string;
+  title: string;
+  _id: string;
+}
+export default function IssueNote({
+  responseState,
+  urlName,
+  title,
+  _id,
+}: IProps) {
+  const navigator = useNavigate();
+
   return (
-    <Wrapper>
+    <Wrapper
+      onClick={() =>
+        navigator(`/${urlName}`, { state: { openIssue: true, _id } })
+      }
+    >
       <IssueContent>
         <IssueTitle>
           <PiWarningCircle />
-          <span>
-            왜 이건 이렇게 되고 저건 저렇게 될까요 ?? 정말로 너무 궁금해요 왜
-            이건 이렇게 되고 저건 저렇게 될까요 ?? 정말로 너무 궁금해요
-          </span>
+          <h3>{title}</h3>
         </IssueTitle>
         <IssueState>
-          <PendingSpan>대기중</PendingSpan>
-          {/* <CompleteSpan>답변완료</CompleteSpan> */}
+          {responseState ? (
+            <CompleteSpan>답변완료</CompleteSpan>
+          ) : (
+            <PendingSpan>대기중</PendingSpan>
+          )}
         </IssueState>
       </IssueContent>
     </Wrapper>
