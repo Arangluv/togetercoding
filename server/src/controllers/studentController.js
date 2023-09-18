@@ -3,6 +3,7 @@ import AWS from "aws-sdk";
 import Lecture from "../models/Lecture";
 import Purchase from "../models/Purchase";
 import Issue from "../models/Issue";
+import Note from "../models/Note";
 AWS.config.update({
   region: process.env.AWS_S3_REGION,
   accessKeyId: process.env.AWS_S3_ACCESS_KEY,
@@ -107,6 +108,23 @@ export const getWriteIssue = async (req, res) => {
     const { id } = req.session.user;
     const issues = await Issue.find({ owner: id });
     return res.status(200).json({ issues });
+  } catch (error) {
+    console.log(error);
+    return res.status(404).send();
+  }
+};
+
+export const getWriteNote = async (req, res) => {
+  try {
+    if (!req.session) {
+      throw new Error(
+        "작성한 노트 및 코멘트를 불러오는데 오류가 발생했습니다."
+      );
+    }
+    const { id: stdId } = req.session.user;
+    const notes = await Note.find({ owner: stdId });
+
+    return res.status(200).json({ notes });
   } catch (error) {
     console.log(error);
     return res.status(404).send();

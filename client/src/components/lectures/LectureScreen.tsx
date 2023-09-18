@@ -6,7 +6,12 @@ import LectureNotification from "./LectureNotification";
 import TypingType from "./TypingType";
 import NotePart from "./NotePart";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { commentState, noteState, panelState } from "../../atom/atoms";
+import {
+  commentState,
+  componentDidMountState,
+  noteState,
+  panelState,
+} from "../../atom/atoms";
 import NoteAndComent from "./NoteAndComent";
 import IssuePart from "./IssuePart";
 import { useLocation } from "react-router-dom";
@@ -17,11 +22,10 @@ import IssueWritePart from "./IssueWritePart";
 const Wrapper = styled.div`
   width: 75%;
   height: 100vh;
-  overflow-y: scroll;
+  overflow: scroll;
   padding-bottom: 10vh;
   position: absolute;
   left: 25%;
-  border: 3px solid blue;
 `;
 
 export default function LectureScreen() {
@@ -31,26 +35,28 @@ export default function LectureScreen() {
   const lectureId = useLocation().pathname.split("/")[3];
   const location = useLocation();
   const ref = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const componentDidMount = useRecoilValue(componentDidMountState);
   useEffect(() => {
-    console.log("ref 몇번 시작?");
-    console.log(ref.current);
-    console.log("location");
-    console.log(location);
+    console.log("ref?.current");
+    console.log(ref?.current);
     if (!location?.state) {
+      containerRef?.current?.scrollTo(0, 0);
       return;
     }
     // 사용자가 이슈를 눌러서 왔다
     setComment("issue");
     setPanel(location.state._id);
-    if (!ref?.current) {
-      console.log("ref 동작안함");
-      console.log(ref);
-      console.log(ref);
-    }
-    ref?.current?.scrollIntoView({ behavior: "smooth" });
-  }, [location, ref]);
+    // ref?.current?.scrollIntoView({ behavior: "smooth" });
+    // 완전히 렌더링 되기전에 호출되는 것을 막기위해
+    const timer = setTimeout(() => {
+      console.log("타이머가 실행되나?");
+      ref?.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [location, componentDidMount]);
   return (
-    <Wrapper>
+    <Wrapper ref={containerRef}>
       <LectureHeader />
       <GithubUrlPart />
       <VedioPart />

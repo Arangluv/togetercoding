@@ -21,7 +21,7 @@ import {
 } from "../api/lectureApi";
 import { toast } from "react-toastify";
 import { NavigateFunction } from "react-router-dom";
-import { getUserIssue, lecturePayment } from "../api/api";
+import { getStudenWritetNote, getUserIssue, lecturePayment } from "../api/api";
 import { UseFormSetValue } from "react-hook-form";
 
 interface LectureItemProps {
@@ -72,7 +72,7 @@ interface ListenLectureIProps {
   studentEmail: string;
 }
 interface ListenLectureDataProps {
-  _id: string;
+  id: string;
   totalLectureQuantity: number;
   completeLectureQuantity: number;
   urlName: string;
@@ -491,4 +491,18 @@ export const useGetUserIssueQuery = () => {
     getUserIssue
   );
   return userIssueData;
+};
+interface StudentNoteProps {
+  _id: string;
+  content: string;
+  ownerNickname: string;
+  ownerProfileUrl: string;
+  urlName: string; // 강의 direct url
+}
+export const useGetStudentNoteQuery = () => {
+  const { data: studentNoteData } = useQuery<StudentNoteProps[]>(
+    ["user-note"],
+    getStudenWritetNote
+  );
+  return studentNoteData;
 };

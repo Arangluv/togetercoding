@@ -132,3 +132,10 @@ export const getUserIssue = async () => {
     withCredentials: true,
   }).then((result) => result.data.issues);
 };
+
+export const getStudenWritetNote = async () => {
+  return await axios({
+    url: `${BASE_URL}/students/notes`,
+    withCredentials: true,
+  }).then((result) => result.data.notes);
+};

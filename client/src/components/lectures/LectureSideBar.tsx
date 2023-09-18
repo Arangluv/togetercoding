@@ -44,22 +44,17 @@ const ProgressiveBar = styled.div`
   background-color: ${(props) => props.theme.textColor};
   display: flex;
 `;
-const ProgressiveStateBar = styled.div<ProgressState>`
-  width: ${(props) => `${props.progressState}%`};
+const ProgressiveStateBar = styled.div`
   height: 100%;
   border-radius: 20px;
   background-color: #0097e6;
   filter: brightness(1.3);
 `;
-interface ProgressState {
-  progressState: number;
-}
 export default function LectureSideBar() {
   const urlName = useLocation().pathname.split("/")[1];
   const { lectureTitleData, lectureTitleDataLoading } = useLectureTitleQuery(
     urlName ? urlName : ""
   );
-
   return (
     <Wrapper>
       <ProgressiveContainer>
@@ -77,12 +72,15 @@ export default function LectureSideBar() {
         </h2>
         <ProgressiveBar>
           <ProgressiveStateBar
-            progressState={
-              lectureTitleData
-                ? lectureTitleData.completeLectureQuantity /
-                  lectureTitleData.totalLectureQuantity
-                : 0
-            }
+            style={{
+              width: lectureTitleData
+                ? `${
+                    (lectureTitleData.completeLectureQuantity /
+                      lectureTitleData.totalLectureQuantity) *
+                    100
+                  }%`
+                : "0%",
+            }}
           ></ProgressiveStateBar>
         </ProgressiveBar>
       </ProgressiveContainer>

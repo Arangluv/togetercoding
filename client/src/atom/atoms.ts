@@ -90,3 +90,8 @@ export const panelState = atom<string | boolean>({
   key: "panelState",
   default: "",
 });
+
+export const componentDidMountState = atom({
+  key: "componentDidMountState",
+  default: false,
+});

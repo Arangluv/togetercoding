@@ -12,8 +12,8 @@ import IssueTitle from "./IssueTitle";
 import { useLocation } from "react-router-dom";
 import { useGetIssueQuery } from "../../hooks/lecture";
 import NoIssueAlarm from "./NoIssueAlarm";
-import { useRecoilState } from "recoil";
-import { panelState } from "../../atom/atoms";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { componentDidMountState, panelState } from "../../atom/atoms";
 import { forwardRef } from "react";
 const Accordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -52,6 +52,16 @@ const IssuePart = React.forwardRef<HTMLDivElement>((props, ref) => {
   const subLectureId = useLocation().pathname.split("/")[3];
   const issueData = useGetIssueQuery(subLectureId);
   const [panel, setPanel] = useRecoilState(panelState);
+  const setComponentDidMount = useSetRecoilState(componentDidMountState);
+  console.log("-------자식컴포넌트에서 ref-------");
+  console.log(ref);
+  console.log("-------자식컴포넌트에서 ref 끝-------");
+  React.useEffect(() => {
+    if (!ref) {
+      return;
+    }
+    setComponentDidMount(true);
+  }, [ref]);
   const handleChange =
     (inputPanel: string) =>
     (event: React.SyntheticEvent, newExpanded: boolean) => {
@@ -59,11 +69,8 @@ const IssuePart = React.forwardRef<HTMLDivElement>((props, ref) => {
     };
 
   return (
-    <div
-      style={{ width: "100%", padding: "1vw", border: "3px solid red" }}
-      ref={ref}
-    >
-      {/* {issueData?.length ? (
+    <div style={{ width: "100%", padding: "1vw" }} ref={ref}>
+      {issueData?.length ? (
         issueData?.map((issue) => {
           return (
             <Accordion
@@ -102,7 +109,7 @@ const IssuePart = React.forwardRef<HTMLDivElement>((props, ref) => {
         })
       ) : (
         <NoIssueAlarm />
-      )} */}
+      )}
     </div>
   );
 });

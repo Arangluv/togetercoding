@@ -4,11 +4,13 @@ import ListenedLecture from "../dashborad/ListenedLecture";
 import IssueNote from "../dashborad/IssueNote";
 import StudyNote from "../dashborad/StudyNote";
 import {
+  useGetStudentNoteQuery,
   useGetUserIssueQuery,
   useListenLectureQuery,
 } from "../../hooks/lecture";
 import { useRecoilValue } from "recoil";
 import { studentLoginState } from "../../atom/atoms";
+import WriteNote from "../dashborad/WriteNote";
 
 const Wrapper = styled.div`
   width: 80%;
@@ -79,8 +81,7 @@ export default function DashBoard() {
   const { email } = useRecoilValue(studentLoginState);
   const listenLectures = useListenLectureQuery({ studentEmail: email });
   const studentIssueData = useGetUserIssueQuery();
-  console.log(studentIssueData);
-  //totalLectureQuantity: 1, completeLectureQuantity: 0}
+  const studentNoteData = useGetStudentNoteQuery();
   return (
     <Wrapper>
       <Title>
@@ -111,7 +112,7 @@ export default function DashBoard() {
           {listenLectures?.map((lecture) => {
             return (
               <ListenedLecture
-                key={lecture._id}
+                key={lecture.id}
                 progressState={
                   lecture.completeLectureQuantity / lecture.totalLectureQuantity
                 } //현재 강의 진행률
@@ -142,11 +143,19 @@ export default function DashBoard() {
       ) : null}
       {currentState === "note" ? (
         <DashBoardIssueBox>
-          <StudyNote />
-          <StudyNote />
-          <StudyNote />
-          <StudyNote />
-          <StudyNote />
+          {studentNoteData
+            ? studentNoteData.map((note) => {
+                return (
+                  <WriteNote
+                    key={note._id}
+                    ownerNickname={note.ownerNickname}
+                    ownerProfileUrl={note.ownerProfileUrl}
+                    content={note.content}
+                    urlName={note.urlName}
+                  />
+                );
+              })
+            : null}
         </DashBoardIssueBox>
       ) : null}
     </Wrapper>

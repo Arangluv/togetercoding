@@ -61,7 +61,7 @@ const ProgressBar = styled.div<ProgressState>`
     height: 100%;
     background-color: #5352ed;
     filter: ${(props) =>
-      props.progressState === 100 ? "brightness(1.5)" : "brightness(1)"};
+      props.progressState === 1 ? "brightness(1.5)" : "brightness(1)"};
   }
 `;
 interface ProgressState {
@@ -80,6 +80,8 @@ export default function ListenedLecture({
   urlName,
 }: IProps) {
   const navigator = useNavigate();
+  console.log("progressState");
+  console.log(progressState);
   return (
     <Wrapper
       whileHover={{ scale: 1.01 }}
@@ -93,7 +95,7 @@ export default function ListenedLecture({
       </LectureTitle>
       <LectureProgressContainer>
         <ProgressBar progressState={progressState}>
-          <div></div>
+          <div style={{ width: `${progressState * 100}%` }}></div>
         </ProgressBar>
         <span>{`${(Number(progressState) * 100).toFixed(0)}% 완료`}</span>
       </LectureProgressContainer>

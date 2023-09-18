@@ -4,6 +4,7 @@ import multer from "multer";
 import multerS3 from "multer-s3";
 import {
   getWriteIssue,
+  getWriteNote,
   postBuyLecture,
   postChangeProfile,
 } from "../controllers/studentController";
@@ -33,4 +34,5 @@ studentRouter
 
 studentRouter.route("/buy-lectures").post(postBuyLecture);
 studentRouter.route("/issues").get(getWriteIssue);
+studentRouter.route("/notes").get(getWriteNote);
 export default studentRouter;
