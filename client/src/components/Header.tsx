@@ -114,7 +114,9 @@ export default function Header() {
             대쉬보드
           </StyledTypo>
         )}
-        <StyledTypo sx={{ minWidth: 100 }}>FAQ</StyledTypo>
+        <StyledTypo sx={{ minWidth: 100 }} onClick={() => navigator("/faq")}>
+          FAQ
+        </StyledTypo>
         {loginState.email === "" ? (
           <StyledTypo
             sx={{ minWidth: 100 }}

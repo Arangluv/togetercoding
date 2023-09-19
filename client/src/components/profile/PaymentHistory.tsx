@@ -9,7 +9,7 @@ const Wrapper = styled.div`
   flex-direction: column;
 `;
 const EmptyNotice = styled.div`
-  width: 80%;
+  width: 100%;
   height: 70vh;
   display: flex;
   align-items: center;
@@ -17,6 +17,7 @@ const EmptyNotice = styled.div`
   span {
     font-size: 2vw;
     color: ${(props) => props.theme.textColor};
+    opacity: 0.8;
   }
 `;
 export default function PaymentHistory() {

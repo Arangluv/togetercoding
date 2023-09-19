@@ -63,6 +63,8 @@ const DashBoardLectureBox = styled.article`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-gap: 20px;
+  position: relative;
+  min-height: 50vh;
 `;
 const DashBoardIssueBox = styled.article`
   width: 100%;
@@ -70,6 +72,17 @@ const DashBoardIssueBox = styled.article`
   display: flex;
   flex-direction: column;
   padding: 0 5vw;
+  position: relative;
+  min-height: 50vh;
+`;
+const EmptyNotice = styled.span`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  color: ${(props) => props.theme.textColor};
+  transform: translate(-50%, -50%);
+  font-size: 1.3vw;
+  opacity: 0.8;
 `;
 interface StateProps {
   currentState: boolean;
@@ -82,6 +95,8 @@ export default function DashBoard() {
   const listenLectures = useListenLectureQuery({ studentEmail: email });
   const studentIssueData = useGetUserIssueQuery();
   const studentNoteData = useGetStudentNoteQuery();
+  console.log("listenLectures");
+  console.log(listenLectures);
   return (
     <Wrapper>
       <Title>
@@ -109,53 +124,62 @@ export default function DashBoard() {
       </NavigationContainer>
       {currentState === "lecture" ? (
         <DashBoardLectureBox>
-          {listenLectures?.map((lecture) => {
-            return (
-              <ListenedLecture
-                key={lecture.id}
-                progressState={
-                  lecture.completeLectureQuantity / lecture.totalLectureQuantity
-                } //현재 강의 진행률
-                urlName={lecture.urlName}
-                name={lecture.name}
-                thumbnail={lecture.thumbnail}
-              />
-            );
-          })}
+          {listenLectures?.length ? (
+            listenLectures?.map((lecture) => {
+              return (
+                <ListenedLecture
+                  key={lecture.id}
+                  progressState={
+                    lecture.completeLectureQuantity /
+                    lecture.totalLectureQuantity
+                  } //현재 강의 진행률
+                  urlName={lecture.urlName}
+                  name={lecture.name}
+                  thumbnail={lecture.thumbnail}
+                />
+              );
+            })
+          ) : (
+            <EmptyNotice>시청중인 강의가 없습니다</EmptyNotice>
+          )}
         </DashBoardLectureBox>
       ) : null}
       {currentState === "issue" ? (
         <DashBoardIssueBox>
-          {studentIssueData
-            ? studentIssueData.map((issue) => {
-                return (
-                  <IssueNote
-                    key={issue._id}
-                    responseState={issue.responseState}
-                    title={issue.title}
-                    urlName={issue.urlName}
-                    _id={issue._id}
-                  />
-                );
-              })
-            : null}
+          {studentIssueData?.length ? (
+            studentIssueData.map((issue) => {
+              return (
+                <IssueNote
+                  key={issue._id}
+                  responseState={issue.responseState}
+                  title={issue.title}
+                  urlName={issue.urlName}
+                  _id={issue._id}
+                />
+              );
+            })
+          ) : (
+            <EmptyNotice>작성한 이슈가 없습니다</EmptyNotice>
+          )}
         </DashBoardIssueBox>
       ) : null}
       {currentState === "note" ? (
         <DashBoardIssueBox>
-          {studentNoteData
-            ? studentNoteData.map((note) => {
-                return (
-                  <WriteNote
-                    key={note._id}
-                    ownerNickname={note.ownerNickname}
-                    ownerProfileUrl={note.ownerProfileUrl}
-                    content={note.content}
-                    urlName={note.urlName}
-                  />
-                );
-              })
-            : null}
+          {studentNoteData?.length ? (
+            studentNoteData.map((note) => {
+              return (
+                <WriteNote
+                  key={note._id}
+                  ownerNickname={note.ownerNickname}
+                  ownerProfileUrl={note.ownerProfileUrl}
+                  content={note.content}
+                  urlName={note.urlName}
+                />
+              );
+            })
+          ) : (
+            <EmptyNotice>작성한 노트가 없습니다</EmptyNotice>
+          )}
         </DashBoardIssueBox>
       ) : null}
     </Wrapper>

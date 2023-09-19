@@ -6,9 +6,9 @@ import Course from "../components/all-course/Course";
 import { useAllLectureQuery } from "../hooks/lecture";
 const Wrapper = styled.div`
   width: 100%;
-  min-height: 124vh;
+  min-height: 126vh;
   padding-top: 6vw;
-  padding-bottom: 24vh;
+  padding-bottom: 26vh;
   background: ${(props) => props.theme.bgImage};
   padding-left: 4vw;
   padding-right: 4vw;

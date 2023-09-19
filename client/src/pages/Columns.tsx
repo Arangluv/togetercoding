@@ -3,9 +3,9 @@ import ColumnFeed from "../components/columns/ColumnFeed";
 
 const Wrapper = styled.div`
   width: 100%;
-  min-height: 124vh;
+  min-height: 126vh;
   padding-top: 8vw;
-  padding-bottom: 24vw;
+  padding-bottom: 26vw;
   padding-left: 3vw;
   padding-right: 3vw;
   background: ${(props) => props.theme.bgImage};

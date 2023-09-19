@@ -12,7 +12,7 @@ import { HTML_CSS_BASIC_ID } from "../utill/lectureId";
 
 const Wrapper = styled.div`
   width: 100%;
-  min-height: 124vh;
+  min-height: 126vㅌh;
   height: auto;
   background: ${(props) => props.theme.bgImage};
   padding-top: 12vw;

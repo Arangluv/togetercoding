@@ -3,7 +3,7 @@ import { AiFillYoutube } from "react-icons/ai";
 import { TbSquareLetterB } from "react-icons/tb";
 const Wrapper = styled.div`
   width: 100%;
-  height: 24vh;
+  height: 26vh;
   position: absolute;
   bottom: 0;
   /* background-image: linear-gradient(to right, #434343 0%, black 100%); */
@@ -33,7 +33,7 @@ const CopyRightPart = styled.div`
 
 const InfoPart = styled.div`
   width: 100%;
-  height: 10vh;
+  height: auto;
   display: flex;
   margin-top: 1vw;
   padding: 1vw;

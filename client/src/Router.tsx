@@ -25,6 +25,8 @@ import UploadLecture from "./components/admin/UploadLecture";
 import MakeLecture from "./components/admin/MakeLecture";
 import UploadDetailLecture from "./components/admin/UploadDetailLecture";
 import ScrollToTop from "./components/ScrollToTop";
+import Faq from "./pages/Faq";
+import FaqContent from "./components/faq-content/FaqContent";
 function Router() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["loginState"],
@@ -54,6 +56,9 @@ function Router() {
               <Route path="dashboard" element={<DashBoard />} />
               <Route path="payment-history" element={<PaymentHistory />} />
               <Route path="certificates" element={<Certificates />} />
+            </Route>
+            <Route path="faq" element={<Faq />}>
+              <Route path=":name" element={<FaqContent />} />
             </Route>
             <Route path="login" element={<Login />} />
             <Route path="join" element={<Join />} />
