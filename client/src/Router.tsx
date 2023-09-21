@@ -27,6 +27,7 @@ import UploadDetailLecture from "./components/admin/UploadDetailLecture";
 import ScrollToTop from "./components/ScrollToTop";
 import Faq from "./pages/Faq";
 import FaqContent from "./components/faq-content/FaqContent";
+import PaymentScreen from "./components/payment/PaymentScreen";
 function Router() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["loginState"],
@@ -66,6 +67,10 @@ function Router() {
             <Route path="columns" element={<Columns />} />
             <Route path="all-courses" element={<AllCourses />} />
             <Route path="html-css-basic" element={<BasicHtmlCss />} />
+            <Route
+              path=":lectureName/purchase-check"
+              element={<PaymentScreen />}
+            />
           </Route>
           <Route path="/kakao-login" element={<KakaoLoading />} />
           <Route path="/html-css-basic/lectures" element={<Lectures />}>
