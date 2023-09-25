@@ -8,5 +8,4 @@ const adminRouter = express.Router();
 
 adminRouter.route("/token-check").get(tokenCheck);
 adminRouter.route("/refresh-token").get(refreshTokenInspect);
-
 export default adminRouter;

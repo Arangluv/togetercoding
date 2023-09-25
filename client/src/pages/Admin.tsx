@@ -51,10 +51,10 @@ export default function Admin() {
           <Link to="upload-lecture">새로운 강의 올리기</Link>
         </li>
         <li>
-          <Link to="#">수강생들 댓글</Link>
+          <Link to="comments">수강생들 댓글</Link>
         </li>
         <li>
-          <Link to="make-faq">FAQ</Link>
+          <Link to="issues">이슈</Link>
         </li>
       </List>
       <Outlet />

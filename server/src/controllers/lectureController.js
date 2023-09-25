@@ -852,3 +852,37 @@ export const postIssueReply = async (req, res) => {
     return res.status(404).send();
   }
 };
+
+export const getAllComment = async (req, res) => {
+  try {
+    console.log(req.query);
+    const { dataQuery } = req.query; // all or week or month
+    let fromTime = null;
+    const toTime = new Date();
+    toTime.setHours(toTime.getHours() + 9);
+    if (dataQuery === "week") {
+      //TODO set from Time
+      fromTime = new Date();
+      fromTime.setDate(fromTime.getDate() - 7);
+    }
+
+    if (dataQuery === "month") {
+      // TODO set from, to Time
+      fromTime = new Date();
+      fromTime.setMonth(fromTime.getMonth() - 1);
+    }
+
+    const comments = fromTime
+      ? await Note.find({
+          createdAt: {
+            $gte: fromTime,
+            $lte: toTime,
+          },
+        })
+      : await Note.find({});
+    return res.status(200).json({ comments });
+  } catch (error) {
+    console.log(error);
+    return res.status(404).send();
+  }
+};

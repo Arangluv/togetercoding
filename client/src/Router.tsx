@@ -28,6 +28,8 @@ import ScrollToTop from "./components/ScrollToTop";
 import Faq from "./pages/Faq";
 import FaqContent from "./components/faq-content/FaqContent";
 import PaymentScreen from "./components/payment/PaymentScreen";
+import StudentIssue from "./components/admin/StudentIssue";
+import StudentComment from "./components/admin/StudentComment";
 function Router() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["loginState"],
@@ -80,6 +82,8 @@ function Router() {
             <Route index element={null} />
             <Route path="upload-lecture" element={<UploadLecture />} />
             <Route path="make-lecture" element={<MakeLecture />} />
+            <Route path="issues" element={<StudentIssue />} />
+            <Route path="comments" element={<StudentComment />} />
           </Route>
           <Route
             path={"/admin-panel/upload-lecture/:lectureId"}

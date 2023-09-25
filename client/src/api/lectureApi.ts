@@ -216,3 +216,11 @@ export const postIssueReply = async (data: IssueReplyProps) => {
     withCredentials: true,
   });
 };
+export const getAllComment = async (dataQuery: string) => {
+  return axios({
+    url: `${BASE_URL}/lectures/all-comment`,
+    method: "GET",
+    params: { dataQuery },
+    withCredentials: true,
+  }).then((result) => result.data.comments);
+};

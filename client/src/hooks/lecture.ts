@@ -23,6 +23,7 @@ import { toast } from "react-toastify";
 import { NavigateFunction } from "react-router-dom";
 import { getStudenWritetNote, getUserIssue, lecturePayment } from "../api/api";
 import { UseFormSetValue } from "react-hook-form";
+import { getAllComment } from "../api/lectureApi";
 
 interface LectureItemProps {
   _id: string;
@@ -505,4 +506,18 @@ export const useGetStudentNoteQuery = () => {
     getStudenWritetNote
   );
   return studentNoteData;
+};
+
+export const useGetAllStudentCommentQuery = (dataQuery: string) => {
+  const { data: allStudentCommentData } = useQuery<StudentNoteProps[]>(
+    ["admin-student-comment", dataQuery],
+    () => getAllComment(dataQuery),
+    {
+      enabled: dataQuery === "" ? false : true,
+      staleTime: 1000 * 60 * 5,
+      cacheTime: Infinity,
+    }
+  );
+
+  return allStudentCommentData;
 };

@@ -2,6 +2,7 @@ import express from "express";
 import {
   deleteMainTheme,
   deleteSubLecture,
+  getAllComment,
   getAllLecture,
   getComment,
   getIssue,
@@ -79,4 +80,5 @@ lectureRouter
   .post(imageUploader.single("referenceImage"), postIssue);
 lectureRouter.route("/get-issues").get(getIssue);
 lectureRouter.route("/reply-issues").post(postIssueReply);
+lectureRouter.route("/all-comment").get(getAllComment);
 export default lectureRouter;
