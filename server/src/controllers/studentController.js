@@ -74,7 +74,6 @@ export const postBuyLecture = async (req, res) => {
       return res.status(404).send();
     }
     const lecture = await Lecture.findOne({ urlName: lectureName });
-
     if (!lecture) {
       return res.status(404).send();
     }
@@ -87,6 +86,14 @@ export const postBuyLecture = async (req, res) => {
       // 이미 구매했으므로 lecture page로 redirect 시켜주어야함
       return res.status(200).redirect("http://localhost:3000/");
     }
+    await buyer.updateOne({
+      $push: {
+        lectureProgress: {
+          lectureName: lecture.name,
+          completeLectureQuantity: 0,
+        },
+      },
+    });
     await Purchase.create({
       buyer: buyer._id,
       course: lecture._id,

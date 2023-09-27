@@ -18,6 +18,7 @@ import {
   postIssue,
   getIssue,
   postIssueReply,
+  getAllIssue,
 } from "../api/lectureApi";
 import { toast } from "react-toastify";
 import { NavigateFunction } from "react-router-dom";
@@ -508,16 +509,34 @@ export const useGetStudentNoteQuery = () => {
   return studentNoteData;
 };
 
-export const useGetAllStudentCommentQuery = (dataQuery: string) => {
+export const useGetAllStudentCommentQuery = (dateQuery: string) => {
   const { data: allStudentCommentData } = useQuery<StudentNoteProps[]>(
-    ["admin-student-comment", dataQuery],
-    () => getAllComment(dataQuery),
+    ["admin-student-comment", dateQuery],
+    () => getAllComment(dateQuery),
     {
-      enabled: dataQuery === "" ? false : true,
+      enabled: dateQuery === "" ? false : true,
       staleTime: 1000 * 60 * 5,
       cacheTime: Infinity,
     }
   );
 
   return allStudentCommentData;
+};
+interface AllIssueProps {
+  _id: string;
+  title: string;
+  urlName: string;
+  ownerNickname: string;
+}
+export const useGetAllStudentIssueQuery = (dateQuery: string) => {
+  const { data: allIssueData } = useQuery<AllIssueProps[]>(
+    ["admin-student-issue", dateQuery],
+    () => getAllIssue(dateQuery),
+    {
+      enabled: dateQuery === "" ? false : true,
+      staleTime: 1000 * 60 * 5,
+      cacheTime: Infinity,
+    }
+  );
+  return allIssueData;
 };

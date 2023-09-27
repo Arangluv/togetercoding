@@ -568,6 +568,9 @@ export const getListenLecture = async (req, res) => {
 
 export const getLectureTitle = async (req, res) => {
   try {
+    const { id: studentId } = req.session.user;
+    console.log("studentId");
+    console.log(studentId);
     const { name: urlName } = req.query;
     const lecture = await Lecture.findOne({ urlName });
     if (!lecture) {
@@ -575,13 +578,29 @@ export const getLectureTitle = async (req, res) => {
         .status(404)
         .json({ message: "강의를 불러오는데 실패했습니다." });
     }
+    const student = await Student.findById(studentId);
+
+    // lectureProgres에서 몇번째에 위치하고 있는지 찾는다
+    const findIdx = student.lectureProgress.findIndex(
+      (progressState) => progressState.lectureName === lecture.name
+    );
+    console.log("findIdx");
+    console.log(findIdx);
+    const completeLectureQuantity =
+      student.lectureProgress[findIdx].completeLectureQuantity;
+
+    if (findIdx === -1) {
+      throw new Error("강의 제목을 불러오는데 오류가 발생했습니다");
+    }
+
     const lectureTitleInfo = {
       name: lecture.name,
       totalLectureQuantity: lecture.totalLectureQuantity,
-      completeLectureQuantity: lecture.completeLectureQuantity,
+      completeLectureQuantity,
     };
     return res.status(200).json({ lectureTitleInfo });
   } catch (error) {
+    console.log(error);
     return res.status(404).json({ message: "강의를 불러오는데 실패했습니다." });
   }
 };
@@ -653,7 +672,21 @@ export const putLectureComplete = async (req, res) => {
         $push: { isTaken: studentId },
       }
     );
-    lecture.completeLectureQuantity = lecture.completeLectureQuantity + 1;
+    await Student.updateOne(
+      {
+        _id: studentId,
+        lectureProgress: {
+          $elemMatch: {
+            lectureName: lecture.name,
+          },
+        },
+      },
+      {
+        $inc: {
+          "lectureProgress.$.completeLectureQuantity": 1,
+        },
+      }
+    );
     await lecture.save();
     return res.status(200).send();
   } catch (error) {
@@ -881,6 +914,40 @@ export const getAllComment = async (req, res) => {
         })
       : await Note.find({});
     return res.status(200).json({ comments });
+  } catch (error) {
+    console.log(error);
+    return res.status(404).send();
+  }
+};
+
+export const getAllIssue = async (req, res) => {
+  const { dateQuery } = req.query;
+  console.log(dateQuery);
+  let fromTime = null;
+  const toTime = new Date();
+  toTime.setHours(toTime.getHours() + 9);
+  if (dateQuery === "week") {
+    //TODO set from Time
+    fromTime = new Date();
+    fromTime.setDate(fromTime.getDate() - 7);
+  }
+
+  if (dateQuery === "month") {
+    // TODO set from, to Time
+    fromTime = new Date();
+    fromTime.setMonth(fromTime.getMonth() - 1);
+  }
+  const issues = fromTime
+    ? await Issue.find({
+        responseState: false,
+        createdAt: {
+          $gte: fromTime,
+          $lte: toTime,
+        },
+      })
+    : await Issue.find({ responseState: false });
+  try {
+    return res.status(200).json({ issues });
   } catch (error) {
     console.log(error);
     return res.status(404).send();

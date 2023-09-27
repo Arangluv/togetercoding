@@ -3,6 +3,7 @@ import {
   deleteMainTheme,
   deleteSubLecture,
   getAllComment,
+  getAllIssue,
   getAllLecture,
   getComment,
   getIssue,
@@ -81,4 +82,5 @@ lectureRouter
 lectureRouter.route("/get-issues").get(getIssue);
 lectureRouter.route("/reply-issues").post(postIssueReply);
 lectureRouter.route("/all-comment").get(getAllComment);
+lectureRouter.route("/all-issues").get(getAllIssue);
 export default lectureRouter;

@@ -224,3 +224,12 @@ export const getAllComment = async (dataQuery: string) => {
     withCredentials: true,
   }).then((result) => result.data.comments);
 };
+
+export const getAllIssue = async (dateQuery: string) => {
+  return axios({
+    url: `${BASE_URL}/lectures/all-issues`,
+    method: "GET",
+    params: { dateQuery },
+    withCredentials: true,
+  }).then((result) => result.data.issues);
+};

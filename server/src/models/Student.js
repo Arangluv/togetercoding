@@ -10,6 +10,12 @@ const studentSchema = new mongoose.Schema({
   nickname: { type: String, required: true, unique: true },
   socialOnly: { type: Boolean, default: false },
   profileImg: { type: String, default: null },
+  lectureProgress: [
+    {
+      lectureName: { type: String },
+      completeLectureQuantity: { type: Number },
+    },
+  ],
   joinState: {
     approve: { type: Boolean, default: false },
     token: { type: String, default: null },
