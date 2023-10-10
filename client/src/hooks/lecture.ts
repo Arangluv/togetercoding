@@ -19,6 +19,7 @@ import {
   getIssue,
   postIssueReply,
   getAllIssue,
+  getLectureProgress,
 } from "../api/lectureApi";
 import { toast } from "react-toastify";
 import { NavigateFunction } from "react-router-dom";
@@ -539,4 +540,17 @@ export const useGetAllStudentIssueQuery = (dateQuery: string) => {
     }
   );
   return allIssueData;
+};
+
+export const useLectureProgressQuery = (lectureName: string) => {
+  const { data: progressState } = useQuery(
+    ["progressState", lectureName],
+    () => getLectureProgress(lectureName),
+    {
+      enabled: lectureName === "" ? false : true,
+      staleTime: 1000 * 60 * 5,
+      cacheTime: Infinity,
+    }
+  );
+  return progressState;
 };

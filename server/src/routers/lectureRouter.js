@@ -8,6 +8,7 @@ import {
   getComment,
   getIssue,
   getLectureList,
+  getLectureProgressState,
   getLectureTitle,
   getListenLecture,
   getMainLecture,
@@ -83,4 +84,5 @@ lectureRouter.route("/get-issues").get(getIssue);
 lectureRouter.route("/reply-issues").post(postIssueReply);
 lectureRouter.route("/all-comment").get(getAllComment);
 lectureRouter.route("/all-issues").get(getAllIssue);
+lectureRouter.route("/progress-state").get(getLectureProgressState);
 export default lectureRouter;

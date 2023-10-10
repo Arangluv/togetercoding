@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { motion, progress } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useLectureProgressQuery } from "../../hooks/lecture";
 const Wrapper = styled(motion.div)`
   width: 100%;
   height: 30vw;
@@ -68,20 +69,32 @@ interface ProgressState {
   progressState: number;
 }
 interface IProps {
-  progressState: number;
+  totalLectureQuantity: number;
   name: string;
   thumbnail: string;
   urlName: string;
 }
 export default function ListenedLecture({
-  progressState,
+  totalLectureQuantity,
   name,
   thumbnail,
   urlName,
 }: IProps) {
   const navigator = useNavigate();
-  console.log("progressState");
-  console.log(progressState);
+  const progressData = useLectureProgressQuery(name);
+  console.log("progressData");
+  console.log(progressData);
+  // stduent
+  // lectureProgress: [
+  //   {
+  //     lectureName: '기초부터 배우는 html-css',
+  //     completeLectureQuantity: 2,
+  //     _id: ObjectId("6513c9b199a799f60bfeef3c")
+  //   }
+  // ],
+
+  // lectures
+  // totalLectureQuantity: 2,
   return (
     <Wrapper
       whileHover={{ scale: 1.01 }}
@@ -94,10 +107,14 @@ export default function ListenedLecture({
         <h2>{name}</h2>
       </LectureTitle>
       <LectureProgressContainer>
-        <ProgressBar progressState={progressState}>
-          <div style={{ width: `${progressState * 100}%` }}></div>
+        <ProgressBar progressState={progressData / totalLectureQuantity}>
+          <div
+            style={{ width: `${(progressData / totalLectureQuantity) * 100}%` }}
+          ></div>
         </ProgressBar>
-        <span>{`${(Number(progressState) * 100).toFixed(0)}% 완료`}</span>
+        <span>{`${(Number(progressData / totalLectureQuantity) * 100).toFixed(
+          0
+        )}% 완료`}</span>
       </LectureProgressContainer>
     </Wrapper>
   );

@@ -129,10 +129,7 @@ export default function DashBoard() {
               return (
                 <ListenedLecture
                   key={lecture.id}
-                  progressState={
-                    lecture.completeLectureQuantity /
-                    lecture.totalLectureQuantity
-                  } //현재 강의 진행률
+                  totalLectureQuantity={lecture.totalLectureQuantity} //현재 강의의 수
                   urlName={lecture.urlName}
                   name={lecture.name}
                   thumbnail={lecture.thumbnail}

@@ -562,7 +562,9 @@ export const getListenLecture = async (req, res) => {
     });
     return res.status(200).json({ listenLectures });
   } catch (error) {
-    return res.status(404).json({ message: "bb" });
+    return res
+      .status(404)
+      .json({ message: "수강중인 강의를 불러오는데 오가 발생했습니다." });
   }
 };
 
@@ -950,6 +952,31 @@ export const getAllIssue = async (req, res) => {
     return res.status(200).json({ issues });
   } catch (error) {
     console.log(error);
+    return res.status(404).send();
+  }
+};
+
+export const getLectureProgressState = async (req, res) => {
+  try {
+    console.log(req.query);
+    const { id: studentId } = req.session.user;
+    const { lectureName } = req.query;
+    if (!studentId) {
+      throw new Error("세션이 없습니다");
+    }
+    const { lectureProgress } = await Student.findById(studentId);
+    const progress = lectureProgress.filter(
+      (progress) => progress.lectureName === lectureName
+    );
+    if (progress.length === 0) {
+      throw new Error("진행도를 찾는데 문제가 발생했습니다");
+    }
+    console.log("progress");
+    console.log(progress);
+    return res
+      .status(200)
+      .json({ completeLectureQuantity: progress[0].completeLectureQuantity });
+  } catch (error) {
     return res.status(404).send();
   }
 };

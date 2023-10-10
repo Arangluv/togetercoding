@@ -233,3 +233,12 @@ export const getAllIssue = async (dateQuery: string) => {
     withCredentials: true,
   }).then((result) => result.data.issues);
 };
+
+export const getLectureProgress = async (lectureName: string) => {
+  return axios({
+    url: `${BASE_URL}/lectures/progress-state`,
+    method: "GET",
+    withCredentials: true,
+    params: { lectureName },
+  }).then((result) => result.data.completeLectureQuantity);
+};

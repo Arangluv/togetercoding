@@ -156,6 +156,8 @@ interface DProps {
 }
 export default function ProfileSub() {
   const loginState = useRecoilValue(studentLoginState);
+  console.log("loginState");
+  console.log(loginState);
   const { mutate, isLoading } = useMutation({
     mutationFn: profileChange,
     onSuccess: () => {
@@ -289,7 +291,7 @@ export default function ProfileSub() {
                 id="email"
                 type="text"
                 readOnly
-                placeholder="디폴트 가입이메일"
+                placeholder={loginState.email}
               />
             </label>
           </ProfileContentSubBox>
