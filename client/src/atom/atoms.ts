@@ -95,3 +95,8 @@ export const componentDidMountState = atom({
   key: "componentDidMountState",
   default: false,
 });
+
+export const footerHeightState = atom<undefined | Number>({
+  key: "footerHeightState",
+  default: undefined,
+});

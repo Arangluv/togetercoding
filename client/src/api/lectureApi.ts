@@ -242,3 +242,12 @@ export const getLectureProgress = async (lectureName: string) => {
     params: { lectureName },
   }).then((result) => result.data.completeLectureQuantity);
 };
+
+export const getPurchaseLectureInfo = async (lectureName: string) => {
+  return axios({
+    url: `${BASE_URL}/lectures/purchase-lecture-info`,
+    method: "GET",
+    withCredentials: true,
+    params: { lectureName },
+  }).then((result) => result.data);
+};

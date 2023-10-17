@@ -14,7 +14,7 @@ import AllCourses from "./pages/AllCourses";
 import BasicHtmlCss from "./pages/BasicHtmlCss";
 import Lectures from "./pages/Lectures";
 import LectureScreen from "./components/lectures/LectureScreen";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { loginState } from "./api/api";
 import { useSetRecoilState } from "recoil";
 import { studentLoginState } from "./atom/atoms";
@@ -30,6 +30,8 @@ import FaqContent from "./components/faq-content/FaqContent";
 import PaymentScreen from "./components/payment/PaymentScreen";
 import StudentIssue from "./components/admin/StudentIssue";
 import StudentComment from "./components/admin/StudentComment";
+import Legal from "./pages/Legal";
+import TermsAndConditions from "./components/legal/TermsAndConditions";
 function Router() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["loginState"],
@@ -73,6 +75,12 @@ function Router() {
               path=":lectureName/purchase-check"
               element={<PaymentScreen />}
             />
+            <Route path="/legal" element={<Legal />}>
+              <Route
+                path="terms-and-conditions"
+                element={<TermsAndConditions />}
+              />
+            </Route>
           </Route>
           <Route path="/kakao-login" element={<KakaoLoading />} />
           <Route path="/html-css-basic/lectures" element={<Lectures />}>

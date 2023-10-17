@@ -12,11 +12,10 @@ import { HTML_CSS_BASIC_ID } from "../utill/lectureId";
 
 const Wrapper = styled.div`
   width: 100%;
-  min-height: 126vㅌh;
+  min-height: 126vh;
   height: auto;
   background: ${(props) => props.theme.bgImage};
   padding-top: 12vw;
-  padding-bottom: 26vh;
   display: flex;
   flex-direction: column;
   padding-left: 10vw;

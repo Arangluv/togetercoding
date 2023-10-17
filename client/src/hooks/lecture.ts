@@ -20,6 +20,7 @@ import {
   postIssueReply,
   getAllIssue,
   getLectureProgress,
+  getPurchaseLectureInfo,
 } from "../api/lectureApi";
 import { toast } from "react-toastify";
 import { NavigateFunction } from "react-router-dom";
@@ -553,4 +554,22 @@ export const useLectureProgressQuery = (lectureName: string) => {
     }
   );
   return progressState;
+};
+
+interface PurchaseInfoProps {
+  name: string;
+  subName: string;
+  lectureThumbnail: string;
+}
+export const usePurchaseLectureInfoQuery = (lectureName: string) => {
+  const { data: purchaseLectureInfo } = useQuery<PurchaseInfoProps>(
+    ["purchaseInfo", lectureName],
+    () => getPurchaseLectureInfo(lectureName),
+    {
+      enabled: lectureName === "" ? false : true,
+      staleTime: 1000 * 60 * 5,
+      cacheTime: Infinity,
+    }
+  );
+  return purchaseLectureInfo;
 };

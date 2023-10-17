@@ -5,7 +5,7 @@ import MainLast from "../components/MainLast";
 
 const Wrapper = styled.div`
   width: 100%;
-  height: 379vh;
+  height: 100%;
 `;
 
 export default function Main() {

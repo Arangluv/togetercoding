@@ -7,7 +7,6 @@ const Wrapper = styled.div`
   width: 100%;
   min-height: 126vh;
   height: auto;
-  padding-bottom: 26vh;
   background: ${(props) => props.theme.bgImage};
   padding-top: 17vh;
 `;

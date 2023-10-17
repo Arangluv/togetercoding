@@ -5,7 +5,6 @@ const Wrapper = styled.div`
   width: 100%;
   min-height: 126vh;
   padding-top: 8vw;
-  padding-bottom: 26vw;
   padding-left: 3vw;
   padding-right: 3vw;
   background: ${(props) => props.theme.bgImage};

@@ -126,6 +126,7 @@ const ForgetEmailBox = styled.div`
     font-size: 1.1vw;
     display: flex;
     align-items: center;
+    transition: all 0.1s ease-in-out;
     svg {
       margin-left: 0.1vw;
     }

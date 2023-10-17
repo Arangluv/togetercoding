@@ -2,15 +2,22 @@ import styled from "styled-components";
 import Header from "./components/Header";
 import { Outlet } from "react-router-dom";
 import Footer from "./components/MainPart/Footer";
+import { useRecoilValue } from "recoil";
+import { footerHeightState } from "./atom/atoms";
 
-const Wrapper = styled.div`
+interface IProps {
+  footerHeight: Number;
+}
+const Wrapper = styled.div<IProps>`
   width: 100%;
   height: auto;
   position: relative;
+  padding-bottom: ${(props) => `${props.footerHeight}px`};
 `;
 function App() {
+  const footerHeight = useRecoilValue(footerHeightState);
   return (
-    <Wrapper>
+    <Wrapper footerHeight={footerHeight ? footerHeight : 0}>
       <Header />
       <Outlet />
       <Footer />

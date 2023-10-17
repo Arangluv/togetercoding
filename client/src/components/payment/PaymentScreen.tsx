@@ -1,4 +1,12 @@
+import { useLocation, useNavigate } from "react-router-dom";
+import { useRecoilValue } from "recoil";
 import styled from "styled-components";
+import {
+  useLecturePaymentMutataion,
+  usePurchaseLectureInfoQuery,
+} from "../../hooks/lecture";
+import { studentLoginState } from "../../atom/atoms";
+import { toast } from "react-toastify";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -108,6 +116,9 @@ const PaymentSelect = styled.div`
     input[type="submit"] {
       display: none;
     }
+    &:hover {
+      cursor: pointer;
+    }
   }
   #line-break {
     width: 100%;
@@ -126,7 +137,26 @@ const PaymentSelect = styled.div`
   }
 `;
 export default function PaymentScreen() {
-  console.log("payment스크린");
+  // 구매 전 로그인 상태 검사
+
+  const { lecturePaymentMutate, paymentLoading } = useLecturePaymentMutataion();
+  const { email } = useRecoilValue(studentLoginState);
+  const lectureName = useLocation().pathname.split("/")[1];
+  const purchaseLectureInfo = usePurchaseLectureInfoQuery(lectureName);
+  const navigator = useNavigate();
+  console.log("email");
+  console.log(email);
+  const handlePurchaseLecture = (
+    event: React.MouseEvent<HTMLLabelElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+    if (!email) {
+      navigator("/login");
+      toast.success("로그인 후 이용해주세요 :)");
+      return;
+    }
+    lecturePaymentMutate({ email, lectureName });
+  };
   return (
     <Wrapper>
       <PaymentWrapper>
@@ -135,15 +165,20 @@ export default function PaymentScreen() {
           <div id="lecture-thumbnail__container">
             <div id="lecture-image-box">
               <img
-                src="https://academy.dream-coding.com/_next/image?url=https%3A%2F%2Fd2lmphbmp3ptuw.cloudfront.net%2Fassets%2FJava_Script_Course_Thumbnail_ebd55f8582.gif&w=3840&q=75"
+                src={
+                  purchaseLectureInfo
+                    ? purchaseLectureInfo.lectureThumbnail
+                    : ""
+                }
                 alt="purchase lecture thumbnail"
               />
             </div>
             <div id="lecture-title__container">
-              <h4>강의 제목</h4>
+              <h4>
+                {purchaseLectureInfo ? purchaseLectureInfo.name : "로딩중.."}
+              </h4>
               <span>
-                강의에 대한 짧은 설명이 들어가게되고 이 부분은 한 이정도의
-                길이를 가질 것으로 예상됩니다
+                {purchaseLectureInfo ? purchaseLectureInfo.subName : "로딩중.."}
               </span>
             </div>
           </div>
@@ -170,7 +205,11 @@ export default function PaymentScreen() {
                 <span>₩</span>350,000
               </small>
             </div>
-            <label id="std-purchase-submit" htmlFor="purchase-submit">
+            <label
+              onClick={handlePurchaseLecture}
+              id="std-purchase-submit"
+              htmlFor="purchase-submit"
+            >
               <span>결제하기</span>
               <input id="purchase-submit" type="submit" />
             </label>

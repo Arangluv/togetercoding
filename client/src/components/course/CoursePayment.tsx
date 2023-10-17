@@ -1,14 +1,11 @@
 import styled from "styled-components";
 import { AiOutlineArrowRight } from "react-icons/ai";
-import { useLecturePaymentMutataion } from "../../hooks/lecture";
-import { useRecoilValue } from "recoil";
-import { studentLoginState } from "../../atom/atoms";
-import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 const Wrapper = styled.div`
   width: 100%;
   min-height: 20vh;
   height: auto;
-  margin-top: 4vw;
+  margin: 4vw 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -126,12 +123,8 @@ interface IProps {
   lectureId: string;
 }
 export default function CoursePayment() {
-  const { lecturePaymentMutate, paymentLoading } = useLecturePaymentMutataion();
-  const { email } = useRecoilValue(studentLoginState);
-  const lectureName = useLocation().pathname.split("/")[1];
-  console.log(lectureName);
-  console.log("paymentLoading");
-  console.log(paymentLoading);
+  const navigator = useNavigate();
+  // onClick={() => lecturePaymentMutate({ email, lectureName })}
   return (
     <Wrapper>
       <Title>
@@ -141,7 +134,7 @@ export default function CoursePayment() {
       <PaymentContainer>
         <ClassInfo>
           <h2>[풀스택] 에어비앤비 클론코딩</h2>
-          <small>현재 20% 할일이 들어가고 있는 상품이에요</small>
+          <small>현재 20% 할인이 들어가고 있는 상품이에요</small>
         </ClassInfo>
         <ClassPaymentPart>
           <PaymentFirstItem>
@@ -150,9 +143,7 @@ export default function CoursePayment() {
             <span id="discount">₩120,000원</span>
           </PaymentFirstItem>
           <PaymentLastItem>
-            <ApplayBtn
-              onClick={() => lecturePaymentMutate({ email, lectureName })}
-            >
+            <ApplayBtn onClick={() => navigator("purchase-check")}>
               수강신청하기
             </ApplayBtn>
           </PaymentLastItem>

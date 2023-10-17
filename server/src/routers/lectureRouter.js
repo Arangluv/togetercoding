@@ -12,6 +12,7 @@ import {
   getLectureTitle,
   getListenLecture,
   getMainLecture,
+  getPurchaseLectureInfo,
   getSubLecture,
   postComment,
   postIssue,
@@ -85,4 +86,5 @@ lectureRouter.route("/reply-issues").post(postIssueReply);
 lectureRouter.route("/all-comment").get(getAllComment);
 lectureRouter.route("/all-issues").get(getAllIssue);
 lectureRouter.route("/progress-state").get(getLectureProgressState);
+lectureRouter.route("/purchase-lecture-info").get(getPurchaseLectureInfo);
 export default lectureRouter;

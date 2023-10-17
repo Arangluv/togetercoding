@@ -80,7 +80,7 @@ export default function Title() {
       <TitleContent>
         <h1>[풀스택] 에어비앤비 클론코딩</h1>
         <small>블로그, 인스타그램 클론코딩을 통한 실전팁까지!</small>
-        <Link to="#" className="btn-grad ">
+        <Link to="purchase-check" className="btn-grad ">
           강의등록 바로가기
           <AiOutlineArrowRight />
         </Link>

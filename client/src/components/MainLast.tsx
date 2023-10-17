@@ -6,7 +6,8 @@ import "slick-carousel/slick/slick-theme.css";
 
 const Wrapper = styled.div`
   width: 100%;
-  height: 115vh;
+  min-height: 115vh;
+  height: auto;
   background-image: linear-gradient(to right, #434343 0%, black 100%);
   display: flex;
   flex-direction: column;

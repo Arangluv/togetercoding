@@ -980,3 +980,23 @@ export const getLectureProgressState = async (req, res) => {
     return res.status(404).send();
   }
 };
+
+export const getPurchaseLectureInfo = async (req, res) => {
+  try {
+    const { lectureName } = req.query;
+    const lecture = await Lecture.findOne({ urlName: lectureName });
+    if (!lecture) {
+      throw new Error("강의를 불러오는데 실패했습니다");
+    }
+    return res
+      .status(200)
+      .json({
+        name: lecture.name,
+        subName: lecture.subName,
+        lectureThumbnail: lecture.thumbnail,
+      });
+  } catch (error) {
+    console.log("구매강의의 정보를 불러오는데 오류가 발생했습니다");
+    return res.status(404).send();
+  }
+};
