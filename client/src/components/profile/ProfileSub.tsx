@@ -156,8 +156,6 @@ interface DProps {
 }
 export default function ProfileSub() {
   const loginState = useRecoilValue(studentLoginState);
-  console.log("loginState");
-  console.log(loginState);
   const { mutate, isLoading } = useMutation({
     mutationFn: profileChange,
     onSuccess: () => {
@@ -166,7 +164,7 @@ export default function ProfileSub() {
       return;
     },
     onError: () => {
-      toast.error("실패 ㅠㅠ");
+      toast.error("프로필사진을 변경하는데 문제가 발생했습니다.");
     },
   });
   const [preview, setPreview] = useState("");

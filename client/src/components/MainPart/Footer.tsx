@@ -116,13 +116,13 @@ export default function Footer() {
       <Navigation>
         <TermsContainer>
           <li>
-            <Link to="#">이용약관</Link>
+            <Link to="/legal/terms-and-conditions">이용약관</Link>
           </li>
           <li>
-            <Link to="#">개인정보처리방침</Link>
+            <Link to="/legal/privacy-policy">개인정보처리방침</Link>
           </li>
           <li>
-            <Link to="#">취소및환불정책</Link>
+            <Link to="/legal/refund-policy">취소및환불정책</Link>
           </li>
         </TermsContainer>
         <SnsInfo>

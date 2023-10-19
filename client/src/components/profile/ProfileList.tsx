@@ -85,19 +85,6 @@ export default function ProfileList() {
           구매내역
         </Link>
       </ListItem>
-      <ListItem>
-        <Link
-          to="certificates"
-          style={{
-            backgroundColor: certificatesMatch
-              ? "rgb(127, 140, 141, 0.2)"
-              : "transparent",
-          }}
-        >
-          <TaskIcon />
-          수료증
-        </Link>
-      </ListItem>
     </Wrapper>
   );
 }

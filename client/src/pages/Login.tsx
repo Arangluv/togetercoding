@@ -9,6 +9,7 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { kakaoLogin, studentLogin } from "../api/api";
 import { studentLoginState } from "../atom/atoms";
 import { useEffect, useState } from "react";
+import { useReceiveAgainEmailVerificationMutate } from "../hooks/lecture";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -138,12 +139,23 @@ const ForgetEmailBox = styled.div`
 const ExtraError = styled.div`
   width: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   margin-top: 1vw;
   span {
     color: ${(props) => props.theme.errorColor};
     font-size: 1.2vw;
+  }
+  small {
+    margin-top: 1vw;
+    color: ${(props) => props.theme.successColor};
+    font-weight: 600;
+    transition: all 0.1s ease-in-out;
+    &:hover {
+      cursor: pointer;
+      filter: brightness(1.1);
+    }
   }
 `;
 const BorderBox = styled.div`
@@ -230,12 +242,12 @@ export default function Login() {
   const { mutate } = useMutation({
     mutationFn: studentLogin,
     onSuccess: () => {
-      toast.success("로그인에 성공했습니다");
+      toast.success("인증링크를 보냈습니다");
       setLoginOk(true);
     },
     onError: (error: any) => {
       console.log(error);
-      toast.error("로그인에 실패했습니다");
+      toast.error("인증링크를 보내는데 문제가 발생했습니다");
       setError("extraError", {
         message: error?.response.data.message,
       });
@@ -244,6 +256,10 @@ export default function Login() {
   const onValid = (data: DProps) => {
     mutate(data);
   };
+  const receiveAgainMutate = useReceiveAgainEmailVerificationMutate({
+    email: watch("email"),
+    setLoginOk,
+  });
   return (
     <Wrapper>
       <Title>같이코딩 로그인</Title>
@@ -290,6 +306,12 @@ export default function Login() {
             {formState.errors.extraError ? (
               <ExtraError>
                 <span>{formState.errors.extraError.message}</span>
+                {formState.errors.extraError.message ===
+                "이메일 인증을 먼저 진행해주세요" ? (
+                  <small onClick={() => receiveAgainMutate()}>
+                    인증링크 다시받기
+                  </small>
+                ) : null}
               </ExtraError>
             ) : null}
           </Form>
@@ -311,9 +333,7 @@ export default function Login() {
           <span>
             <span>{`${watch("email")}`}</span>로 인증링크를 보냈습니다
           </span>
-          <small>
-            이메일에 보낸 인증링크를 클릭하여 회원가입을 완료해주세요
-          </small>
+          <small>이메일에 보낸 인증링크를 클릭하여 로그인을 완료해주세요</small>
         </LoginOkContainer>
       )}
     </Wrapper>

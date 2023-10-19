@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
 import App from "./App";
 import Main from "./pages/Main";
 import Profile from "./pages/Profile";
@@ -16,7 +16,7 @@ import Lectures from "./pages/Lectures";
 import LectureScreen from "./components/lectures/LectureScreen";
 import { useQuery } from "@tanstack/react-query";
 import { loginState } from "./api/api";
-import { useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { studentLoginState } from "./atom/atoms";
 import KakaoLoading from "./pages/KakaoLoading";
 import { useEffect } from "react";
@@ -32,15 +32,23 @@ import StudentIssue from "./components/admin/StudentIssue";
 import StudentComment from "./components/admin/StudentComment";
 import Legal from "./pages/Legal";
 import TermsAndConditions from "./components/legal/TermsAndConditions";
+import PrivacyPolicy from "./components/legal/PrivacyPolicy";
+import RefundPolicy from "./components/legal/RefundPolicy";
 function Router() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["loginState"],
     queryFn: loginState,
   });
+  console.log("data");
+  console.log(data);
   const setStudentLogin = useSetRecoilState(studentLoginState);
+  const test = useRecoilValue(studentLoginState);
   useEffect(() => {
     if (!isLoading && data) {
       const { name, nickname, profileImg, email } = data;
+      if (name === undefined) {
+        return;
+      }
       setStudentLogin({
         username: name,
         nickname,
@@ -80,6 +88,8 @@ function Router() {
                 path="terms-and-conditions"
                 element={<TermsAndConditions />}
               />
+              <Route path="privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="refund-policy" element={<RefundPolicy />} />
             </Route>
           </Route>
           <Route path="/kakao-login" element={<KakaoLoading />} />

@@ -6,8 +6,7 @@ import {
   postKakaoLogin,
   postLogin,
   postLogout,
-  refreshToken,
-  removeToken,
+  postReceiveAgainEmailVerification,
   tokenInspect,
 } from "../controllers/globalController";
 import { notAllowLogined } from "../middleware/auth";
@@ -19,8 +18,9 @@ globalRouter.route("/email-varification").get(getEmailVerification);
 globalRouter.route("/login").post(notAllowLogined, postLogin);
 globalRouter.route("/email-login-varification").get(getLoginEmailVerification);
 globalRouter.route("/token-inspect").get(tokenInspect);
-globalRouter.route("/refresh-token").get(refreshToken);
-globalRouter.route("/remove-token").get(removeToken);
 globalRouter.route("/kakao-login").post(postKakaoLogin);
 globalRouter.route("/logout").post(postLogout);
+globalRouter
+  .route("/receive-again-email-varification")
+  .post(postReceiveAgainEmailVerification);
 export default globalRouter;

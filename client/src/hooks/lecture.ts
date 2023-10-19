@@ -24,7 +24,12 @@ import {
 } from "../api/lectureApi";
 import { toast } from "react-toastify";
 import { NavigateFunction } from "react-router-dom";
-import { getStudenWritetNote, getUserIssue, lecturePayment } from "../api/api";
+import {
+  getStudenWritetNote,
+  getUserIssue,
+  lecturePayment,
+  postReceiveAgainEmailVerification,
+} from "../api/api";
 import { UseFormSetValue } from "react-hook-form";
 import { getAllComment } from "../api/lectureApi";
 
@@ -572,4 +577,24 @@ export const usePurchaseLectureInfoQuery = (lectureName: string) => {
     }
   );
   return purchaseLectureInfo;
+};
+
+interface ReceiveAgainEmailVerificationProps {
+  email: string;
+  setLoginOk: React.Dispatch<React.SetStateAction<boolean>>;
+}
+export const useReceiveAgainEmailVerificationMutate = ({
+  email,
+  setLoginOk,
+}: ReceiveAgainEmailVerificationProps) => {
+  const { mutate: receiveAgainMutate } = useMutation({
+    mutationFn: () => postReceiveAgainEmailVerification(email),
+    onSuccess: () => {
+      setLoginOk(true);
+    },
+    onError: () => {
+      toast.error("인증링크를 보내는데 문제가 발생했습니다");
+    },
+  });
+  return receiveAgainMutate;
 };

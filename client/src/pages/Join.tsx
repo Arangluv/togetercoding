@@ -7,6 +7,7 @@ import { kakaoLogin, studentJoin } from "../api/api";
 import { toast } from "react-toastify";
 import { useState } from "react";
 import { AiOutlineCheckCircle } from "react-icons/ai";
+import { Link } from "react-router-dom";
 const Wrapper = styled.div`
   width: 100%;
   height: 128vh;
@@ -131,7 +132,7 @@ const TermsLabel = styled.label`
       cursor: pointer;
     }
     color: ${(props) => props.theme.textColor};
-    small {
+    a {
       color: #00aff0;
       font-weight: 600;
     }
@@ -362,8 +363,9 @@ export default function Join() {
                     id="terms_agree"
                   />
                   <span>
-                    <small>개인정보처리 방침</small> 및 <small>이용약관</small>
-                    에 동의합니다{" "}
+                    <Link to="/legal/privacy-policy">개인정보처리 방침</Link> 및{" "}
+                    <Link to="/legal/terms-and-conditions">이용약관</Link>에
+                    동의합니다{" "}
                   </span>
                   {formState.errors.terms_agree ? (
                     <small id="error_caution">

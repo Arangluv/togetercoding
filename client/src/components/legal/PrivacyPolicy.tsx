@@ -34,10 +34,11 @@ const TermsContainer = styled.article`
     white-space: pre-wrap;
   }
 `;
-export default function TermsAndConditions() {
+
+export default function PrivacyPolicy() {
   return (
     <Wrapper>
-      <h2>이용약관</h2>
+      <h2>개인정보처리방침</h2>
       <TermsContainer>
         <div>
           <h3>제 1조 (목적)</h3>
@@ -49,30 +50,6 @@ export default function TermsAndConditions() {
             법령을 준수하고, 서비스 이용자의 개인정보 보호 관련한 고충을
             신속하고 원활하게 처리할 수 있도록 하기 위하여 다음과 같이
             개인정보처리방침(이하 '본 방침')을 수립합니다.
-          </p>
-        </div>
-        <div>
-          <h3>제 2조 (개인정보 처리의 원칙)</h3>
-          <p>
-            개인정보 관련 법령 및 본 방침에 따라 회사는 필요한 목적 범위
-            내에서만 이용자의 개인정보를 수집할 수 있습니다.
-          </p>
-        </div>
-        <div>
-          <h3>제 3조 (회원 가입을 위한 정보)</h3>
-          <p>
-            {`회사는 이용자의 회사 서비스에 대한 회원가입을 위하여 다음과 같은 정보를 수집합니다.
-필수 수집 정보: 이메일 주소, 이름 및 닉네임`}
-          </p>
-        </div>
-        <div>
-          <h3>제 4조 (개인정보 수집 방법)</h3>
-          <p>
-            {`회사는 다음과 같은 방법으로 이용자의 개인정보를 수집합니다.
-
-이용자가 회사의 홈페이지에 자신의 개인정보를 입력하는 방식
-어플리케이션 등 회사가 제공하는 홈페이지 외의 서비스를 통해 이용자가 자신의 개인정보를 입력하는 방식
-SNS계정 (구글, 카카오, 깃헙)으로 가입/로그인시 OAuth 입력하는 방식`}
           </p>
         </div>
       </TermsContainer>

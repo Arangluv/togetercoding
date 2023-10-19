@@ -32,45 +32,9 @@ export const loginState = async () => {
   return axios({
     url: `${BASE_URL}/token-inspect`,
     withCredentials: true,
-  })
-    .then((result) => {
-      return result.data;
-    })
-    .catch(async (error) => {
-      let data = null;
-      if (error.response.data.errorCode === 1) {
-        await axios({
-          url: `${BASE_URL}/refresh-token`,
-          method: "GET",
-          withCredentials: true,
-        }).then((result) => {
-          data = result.data;
-        });
-        return data;
-      }
-      if (error.response.data.errorCode === -1) {
-        await axios({
-          url: `${BASE_URL}/remove-token`,
-          method: "GET",
-          withCredentials: true,
-        }).then(() => {
-          data = {
-            username: "",
-            nickname: "",
-            email: "",
-            profileImg: "",
-          };
-        });
-        return data;
-      }
-      // unknown error occur
-      return {
-        username: "",
-        nickname: "",
-        email: "",
-        profileImg: "",
-      };
-    });
+  }).then((result) => {
+    return result.data;
+  });
 };
 
 export const studentLogin = async (data: LoginData) => {
@@ -129,6 +93,7 @@ export const lecturePayment = async ({
 export const getUserIssue = async () => {
   return await axios({
     url: `${BASE_URL}/students/issues`,
+    method: "GET",
     withCredentials: true,
   }).then((result) => result.data.issues);
 };
@@ -136,6 +101,16 @@ export const getUserIssue = async () => {
 export const getStudenWritetNote = async () => {
   return await axios({
     url: `${BASE_URL}/students/notes`,
+    method: "GET",
     withCredentials: true,
   }).then((result) => result.data.notes);
+};
+
+export const postReceiveAgainEmailVerification = async (email: string) => {
+  return axios({
+    url: `${BASE_URL}/receive-again-email-varification`,
+    method: "POST",
+    withCredentials: true,
+    data: { email },
+  });
 };
