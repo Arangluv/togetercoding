@@ -116,7 +116,15 @@ export default function AccordionLecture() {
                     },
                   }}
                 >
-                  <Typography>{mainLecture.name}</Typography>
+                  <Typography
+                    sx={{
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "pre-wrap",
+                    }}
+                  >
+                    {mainLecture.name}
+                  </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   {mainLecture.subLecture.map((subLecture) => {

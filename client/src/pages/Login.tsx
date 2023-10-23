@@ -239,7 +239,8 @@ export default function Login() {
       navigator("/");
     }
   }, [loginState]);
-  const { mutate } = useMutation({
+  const { mutate, isSuccess, isLoading } = useMutation({
+    mutationKey: ["std-login"],
     mutationFn: studentLogin,
     onSuccess: () => {
       toast.success("인증링크를 보냈습니다");
@@ -253,7 +254,12 @@ export default function Login() {
       });
     },
   });
+  console.log("isSuccess");
+  console.log(isSuccess);
   const onValid = (data: DProps) => {
+    if (isLoading) {
+      return;
+    }
     mutate(data);
   };
   const receiveAgainMutate = useReceiveAgainEmailVerificationMutate({
@@ -292,7 +298,7 @@ export default function Login() {
             </NameInfoBox>
             <SubmitLabel htmlFor="login_submit">
               <span>로그인</span>
-              <input type="submit" id="login_submit" />
+              <input disabled={isLoading} type="submit" id="login_submit" />
             </SubmitLabel>
             <JoinLabel onClick={() => navigator("/join")}>
               <span>회원가입</span>

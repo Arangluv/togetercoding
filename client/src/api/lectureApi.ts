@@ -2,6 +2,7 @@ import axios from "axios";
 import { BASE_URL } from "../utill/url";
 import { SetterOrUpdater, useSetRecoilState } from "recoil";
 import { uploadProgressState } from "../atom/atoms";
+import { NavigateFunction } from "react-router-dom";
 interface MainThemeProps {
   lectureName: string;
   lectureId: string;
@@ -243,11 +244,21 @@ export const getLectureProgress = async (lectureName: string) => {
   }).then((result) => result.data.completeLectureQuantity);
 };
 
-export const getPurchaseLectureInfo = async (lectureName: string) => {
+export const getPurchaseLectureInfo = async (
+  lectureName: string,
+  navigator: NavigateFunction
+) => {
   return axios({
     url: `${BASE_URL}/lectures/purchase-lecture-info`,
     method: "GET",
     withCredentials: true,
     params: { lectureName },
-  }).then((result) => result.data);
+  }).then((result) => {
+    console.log(result);
+    if (result.data?.redirectName) {
+      navigator(`/${result.data.redirectName}/lectures`);
+      return;
+    }
+    return result.data;
+  });
 };

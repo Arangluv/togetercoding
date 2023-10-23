@@ -230,11 +230,17 @@ export const useSubLectureRemoveMutation = ({
   return subLectureRemoveMutate;
 };
 
-export const useLecturePaymentMutataion = () => {
+export const useLecturePaymentMutataion = (navigator: NavigateFunction) => {
   const { mutate: lecturePaymentMutate, isLoading: paymentLoading } =
     useMutation({
       mutationFn: lecturePayment,
-      onSuccess: () => {
+      onSuccess: (data) => {
+        console.log("data");
+        console.log(data);
+        if (data?.data?.redirectName) {
+          navigator(`/${data?.data.redirectName}/lectures`);
+          return;
+        }
         toast.success("임시적으로 구매 성공!");
       },
       onError: () => {
@@ -566,10 +572,13 @@ interface PurchaseInfoProps {
   subName: string;
   lectureThumbnail: string;
 }
-export const usePurchaseLectureInfoQuery = (lectureName: string) => {
+export const usePurchaseLectureInfoQuery = (
+  lectureName: string,
+  navigator: NavigateFunction
+) => {
   const { data: purchaseLectureInfo } = useQuery<PurchaseInfoProps>(
     ["purchaseInfo", lectureName],
-    () => getPurchaseLectureInfo(lectureName),
+    () => getPurchaseLectureInfo(lectureName, navigator),
     {
       enabled: lectureName === "" ? false : true,
       staleTime: 1000 * 60 * 5,

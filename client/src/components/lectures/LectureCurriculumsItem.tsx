@@ -5,7 +5,8 @@ import { studentMainTheme } from "../../atom/atoms";
 
 const Wrapper = styled.div<IsTakenStyleProps>`
   width: 100%;
-  height: 6vh;
+  min-height: 6vh;
+  height: auto;
   background-color: #636e72;
   padding: 0.5vw 1vw;
   display: flex;
@@ -18,6 +19,12 @@ const Wrapper = styled.div<IsTakenStyleProps>`
   }
   span {
     color: white;
+    display: block;
+    width: 60%;
+    line-height: 1.5;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: pre-wrap;
   }
   a {
     display: flex;

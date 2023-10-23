@@ -571,9 +571,9 @@ export const getListenLecture = async (req, res) => {
 export const getLectureTitle = async (req, res) => {
   try {
     const { id: studentId } = req.session.user;
-    console.log("studentId");
-    console.log(studentId);
     const { name: urlName } = req.query;
+    console.log("urlName");
+    console.log(urlName);
     const lecture = await Lecture.findOne({ urlName });
     if (!lecture) {
       return res
@@ -586,14 +586,10 @@ export const getLectureTitle = async (req, res) => {
     const findIdx = student.lectureProgress.findIndex(
       (progressState) => progressState.lectureName === lecture.name
     );
-    console.log("findIdx");
-    console.log(findIdx);
     const completeLectureQuantity =
-      student.lectureProgress[findIdx].completeLectureQuantity;
-
-    if (findIdx === -1) {
-      throw new Error("강의 제목을 불러오는데 오류가 발생했습니다");
-    }
+      findIdx === -1
+        ? 0
+        : student.lectureProgress[findIdx].completeLectureQuantity;
 
     const lectureTitleInfo = {
       name: lecture.name,
@@ -664,7 +660,14 @@ export const putLectureComplete = async (req, res) => {
       throw new Error("강의를 완료하는데 오류가 발생했습니다");
     }
     // 학생이 이미 강의를 수강한 경우
-    if (subLecture.isTaken.findIndex((stdId) => stdId === studentId) !== -1) {
+    console.log("studentId");
+    console.log(studentId);
+    // 6513c5f92fd8fec73d015dcc
+    if (
+      subLecture.isTaken.findIndex(
+        (stdId) => stdId.toString() === studentId
+      ) !== -1
+    ) {
       return res.status(200).send();
     }
     // 학생이 강의 수강을 아직 안한 경우
@@ -984,17 +987,36 @@ export const getLectureProgressState = async (req, res) => {
 export const getPurchaseLectureInfo = async (req, res) => {
   try {
     const { lectureName } = req.query;
+    console.log(req.session);
+    const { user } = req.session;
     const lecture = await Lecture.findOne({ urlName: lectureName });
     if (!lecture) {
       throw new Error("강의를 불러오는데 실패했습니다");
     }
-    return res
-      .status(200)
-      .json({
-        name: lecture.name,
-        subName: lecture.subName,
-        lectureThumbnail: lecture.thumbnail,
+    if (user) {
+      // 유저가 있고, 이미 구매를 했다면 강의 페이지로 이동시킨다
+      const { id } = user;
+      const purchase = await Purchase.find({ buyer: id }).populate({
+        path: "course",
+        model: "Lecture",
+        match: { name: "기초부터 배우는 html-css" }, // Lecture에서 이름이 일치하는 것만 선택
       });
+      console.log("Purchase ? ");
+      console.log(purchase);
+      if (!purchase) {
+        return;
+      }
+      console.log("여기가 실행");
+      return res
+        .status(200)
+        .json({ message: "이미 구매했습니다", redirectName: lecture.urlName });
+    }
+
+    return res.status(200).json({
+      name: lecture.name,
+      subName: lecture.subName,
+      lectureThumbnail: lecture.thumbnail,
+    });
   } catch (error) {
     console.log("구매강의의 정보를 불러오는데 오류가 발생했습니다");
     return res.status(404).send();

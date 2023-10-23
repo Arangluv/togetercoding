@@ -8,6 +8,7 @@ const Wrapper = styled.div`
   height: 100vh;
   position: fixed;
   background-color: #222f3e;
+  border-right: 1px solid rgba(227, 227, 227, 0.1);
   left: 0;
 `;
 const ProgressiveContainer = styled.div`
@@ -25,9 +26,14 @@ const ProgressiveContainer = styled.div`
     align-items: center;
     justify-content: space-between;
     span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: pre-wrap;
       color: ${(props) => props.theme.textColor};
       font-weight: 600;
       font-size: 1.3vw;
+      display: block;
+      width: 80%;
     }
     small {
       color: #0097e6;

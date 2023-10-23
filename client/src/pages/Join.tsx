@@ -263,13 +263,9 @@ export default function Join() {
     mutationFn: (joinData: DProps) => studentJoin(joinData),
     onSuccess: () => {
       toast.success("회원가입에 성공했습니다!");
-      console.log("회원가입 후 데이터?");
-      console.log(data);
       setJoinOk(true);
     },
     onError: (error: any) => {
-      console.log("onError 속 error");
-      console.log(error);
       toast.error("회원가입중 오류가 발생했습니다");
       setError("extraError", {
         message: error?.response?.data?.message,
@@ -278,6 +274,9 @@ export default function Join() {
     },
   });
   const onValid = (data: DProps) => {
+    if (isLoading) {
+      return;
+    }
     mutate(data);
   };
   return (
