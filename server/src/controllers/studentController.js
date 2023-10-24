@@ -70,6 +70,8 @@ export const postBuyLecture = async (req, res) => {
       name: req.session.user.name,
       email,
     });
+    console.log("buyer");
+    console.log(buyer);
     if (!buyer) {
       return res.status(404).send();
     }

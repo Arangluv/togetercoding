@@ -22,6 +22,7 @@ interface AdminProps {
 const IssueContainer = styled.article<AdminProps>`
   display: flex;
   flex-direction: column;
+  padding: 1vw;
   width: 100%;
   min-height: 20vh;
   height: auto;
@@ -81,23 +82,25 @@ const IssueContent = styled.div`
 const IssueImage = styled.div`
   width: 100%;
   height: 50vh;
-  overflow-y: scroll;
-  object-fit: cover;
   padding: 1vw;
+  border: 1px dotted white;
+  border-radius: 10px;
   img {
+    object-fit: contain;
     width: 100%;
     height: 100%;
   }
 `;
 
-const IssueReplyForm = styled.form`
+const IssueReplyForm = styled.form<AdminProps>`
   display: flex;
   flex-direction: column;
   width: 100%;
   min-height: 20vh;
   height: auto;
   border-radius: 10px;
-  background-color: rgba(255, 165, 2, 0.5);
+  background-color: ${(props) =>
+    props.isAdmin ? "rgba(255, 165, 2, 0.5)" : "#616265"};
   margin-bottom: 1vw;
 `;
 const IsuueLabel = styled.label`
@@ -180,6 +183,8 @@ export default function IssueItemContainer({
   const [value, setValue] = useState(""); // 빈 경우는 <p><br></p> 경우도 존재;
   const [replyState, setReplyState] = useState<null | string>(null);
   const [canReply, setCanReply] = useState(false);
+  const [replyAdmin, setReplyAdmin] = useState(false);
+  const [replyOwn, setReplyOwn] = useState(false);
   const postReplyMutate = usePostIssueReplyMutation({
     queryClient,
     subLectureId,
@@ -202,23 +207,38 @@ export default function IssueItemContainer({
   // 일단 처음은 admin만
   // 대댓글부터 issue를 유저가 달 수 있다.
   // 단 본인이 직접 쓴글에만!
-
+  console.log("stdLoginState.nickname");
+  console.log(stdLoginState.nickname);
+  console.log("ownerNickname");
+  console.log(ownerNickname);
+  console.log("issueReply.length");
+  console.log(issueReply.length);
   useEffect(() => {
     if (
       process.env.REACT_APP_ADMIN_EMAIL == stdLoginState.email &&
       process.env.REACT_APP_ADMIN_USERNAME === stdLoginState.username
     ) {
-      setCanReply(true);
+      setReplyAdmin(true);
       return;
     }
     if (stdLoginState.nickname === ownerNickname) {
-      setCanReply(true);
+      setReplyOwn(true);
       return;
     }
     return;
   }, [stdLoginState]);
+  useEffect(() => {
+    if (issueReply.length === 0 && replyAdmin) {
+      console.log("여기가 실행되어야함");
+      setCanReply(true);
+      return;
+    }
+    if (issueReply.length !== 0 && (replyAdmin || replyOwn)) {
+      setCanReply(true);
+      return;
+    }
+  }, [issueReply, replyAdmin, replyOwn]);
   const onValid = () => {
-    console.log("실행");
     if (value === "") {
       setError("extraError", { message: "답글내용을 입력해주세요" });
       return;
@@ -286,15 +306,19 @@ export default function IssueItemContainer({
           })
         : null}
       {replyState ? (
-        <IssueReplyForm onSubmit={handleSubmit(onValid)}>
+        <IssueReplyForm onSubmit={handleSubmit(onValid)} isAdmin={replyAdmin}>
           <InfoBox>
             <InfoProfile>
-              <img
-                src="https://www.asemhobby.co.kr/shopimages/ysacademy/003003000700.jpg?1678433700"
-                alt="issue writer profile image"
-              />
+              {stdLoginState.profileImg ? (
+                <img
+                  src={stdLoginState.profileImg}
+                  alt="issue writer profile image"
+                />
+              ) : (
+                <FaUserCircle />
+              )}
             </InfoProfile>
-            <span>같이코딩</span>
+            <span>{stdLoginState.nickname}</span>
           </InfoBox>
           <IsuueLabel>
             <span>

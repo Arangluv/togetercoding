@@ -572,8 +572,6 @@ export const getLectureTitle = async (req, res) => {
   try {
     const { id: studentId } = req.session.user;
     const { name: urlName } = req.query;
-    console.log("urlName");
-    console.log(urlName);
     const lecture = await Lecture.findOne({ urlName });
     if (!lecture) {
       return res
@@ -880,10 +878,17 @@ export const postIssueReply = async (req, res) => {
       authorType: isAdmin,
       content,
     });
-    await Issue.updateOne(
-      { _id: issueId },
-      { $push: { issueReply: issueReply._id }, responseState: true }
-    );
+    if (isAdmin) {
+      await Issue.updateOne(
+        { _id: issueId },
+        { $push: { issueReply: issueReply._id }, responseState: true }
+      );
+    } else {
+      await Issue.updateOne(
+        { _id: issueId },
+        { $push: { issueReply: issueReply._id }, responseState: false }
+      );
+    }
     return res.status(200).send();
   } catch (error) {
     console.log(error);
@@ -987,7 +992,6 @@ export const getLectureProgressState = async (req, res) => {
 export const getPurchaseLectureInfo = async (req, res) => {
   try {
     const { lectureName } = req.query;
-    console.log(req.session);
     const { user } = req.session;
     const lecture = await Lecture.findOne({ urlName: lectureName });
     if (!lecture) {
@@ -1001,17 +1005,17 @@ export const getPurchaseLectureInfo = async (req, res) => {
         model: "Lecture",
         match: { name: "기초부터 배우는 html-css" }, // Lecture에서 이름이 일치하는 것만 선택
       });
-      console.log("Purchase ? ");
-      console.log(purchase);
-      if (!purchase) {
-        return;
+      if (purchase.length === 0) {
+        return res.status(200).json({
+          name: lecture.name,
+          subName: lecture.subName,
+          lectureThumbnail: lecture.thumbnail,
+        });
       }
-      console.log("여기가 실행");
       return res
         .status(200)
         .json({ message: "이미 구매했습니다", redirectName: lecture.urlName });
     }
-
     return res.status(200).json({
       name: lecture.name,
       subName: lecture.subName,

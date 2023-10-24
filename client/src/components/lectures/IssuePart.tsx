@@ -53,9 +53,6 @@ const IssuePart = React.forwardRef<HTMLDivElement>((props, ref) => {
   const issueData = useGetIssueQuery(subLectureId);
   const [panel, setPanel] = useRecoilState(panelState);
   const setComponentDidMount = useSetRecoilState(componentDidMountState);
-  console.log("-------자식컴포넌트에서 ref-------");
-  console.log(ref);
-  console.log("-------자식컴포넌트에서 ref 끝-------");
   React.useEffect(() => {
     if (!ref) {
       return;

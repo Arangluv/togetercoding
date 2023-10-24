@@ -254,6 +254,7 @@ export const getPurchaseLectureInfo = async (
     withCredentials: true,
     params: { lectureName },
   }).then((result) => {
+    console.log("result");
     console.log(result);
     if (result.data?.redirectName) {
       navigator(`/${result.data.redirectName}/lectures`);

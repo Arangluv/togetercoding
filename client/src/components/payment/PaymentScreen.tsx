@@ -140,11 +140,17 @@ export default function PaymentScreen() {
   // 구매 전 로그인 상태 검사
 
   const navigator = useNavigate();
-  const { lecturePaymentMutate, paymentLoading } =
-    useLecturePaymentMutataion(navigator);
+  const urlName = useLocation().pathname.split("/")[1];
+  const { lecturePaymentMutate, paymentLoading } = useLecturePaymentMutataion(
+    navigator,
+    urlName
+  );
   const { email } = useRecoilValue(studentLoginState);
   const lectureName = useLocation().pathname.split("/")[1];
-  const purchaseLectureInfo = usePurchaseLectureInfoQuery(lectureName, navigator);
+  const purchaseLectureInfo = usePurchaseLectureInfoQuery(
+    lectureName,
+    navigator
+  );
   const handlePurchaseLecture = (
     event: React.MouseEvent<HTMLLabelElement, MouseEvent>
   ) => {

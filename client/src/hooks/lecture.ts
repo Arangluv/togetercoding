@@ -230,7 +230,10 @@ export const useSubLectureRemoveMutation = ({
   return subLectureRemoveMutate;
 };
 
-export const useLecturePaymentMutataion = (navigator: NavigateFunction) => {
+export const useLecturePaymentMutataion = (
+  navigator: NavigateFunction,
+  urlName: string
+) => {
   const { mutate: lecturePaymentMutate, isLoading: paymentLoading } =
     useMutation({
       mutationFn: lecturePayment,
@@ -242,6 +245,7 @@ export const useLecturePaymentMutataion = (navigator: NavigateFunction) => {
           return;
         }
         toast.success("임시적으로 구매 성공!");
+        navigator(`/${urlName}/lectures`);
       },
       onError: () => {
         toast.error("구매하는데 문제가 발생 ㅠ.ㅠ");
