@@ -100,3 +100,8 @@ export const footerHeightState = atom<undefined | Number>({
   key: "footerHeightState",
   default: undefined,
 });
+
+export const paymentStste = atom<null | "on" | "cancel">({
+  key: "paymentState",
+  default: null,
+});

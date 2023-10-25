@@ -34,13 +34,12 @@ import Legal from "./pages/Legal";
 import TermsAndConditions from "./components/legal/TermsAndConditions";
 import PrivacyPolicy from "./components/legal/PrivacyPolicy";
 import RefundPolicy from "./components/legal/RefundPolicy";
+import Payment from "./components/payment/Payment";
 function Router() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["loginState"],
     queryFn: loginState,
   });
-  console.log("data");
-  console.log(data);
   const setStudentLogin = useSetRecoilState(studentLoginState);
   const test = useRecoilValue(studentLoginState);
   useEffect(() => {
@@ -92,6 +91,7 @@ function Router() {
               <Route path="refund-policy" element={<RefundPolicy />} />
             </Route>
           </Route>
+          <Route path="/payment" element={<Payment />} />
           <Route path="/kakao-login" element={<KakaoLoading />} />
           <Route path="/html-css-basic/lectures" element={<Lectures />}>
             <Route path=":lectureId" element={<LectureScreen />} />
