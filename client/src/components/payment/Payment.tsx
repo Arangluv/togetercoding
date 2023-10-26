@@ -89,7 +89,7 @@ const PurchaseDetailContainer = styled.div`
 export default function Payment() {
   // Toss Payment
   const paymentWidgetRef = useRef<PaymentWidgetInstance | null>(null);
-  const price = 50_000; // 금액을 받아와야한다
+  const price = 1000; // 금액을 받아와야한다
   const clientKey = "test_ck_P24xLea5zVA69Mpa5glrQAMYNwW6";
   const customerKey = nanoid(); //회원 식별번호
   const setPaymentState = useSetRecoilState(paymentStste);
@@ -120,8 +120,8 @@ export default function Payment() {
                 orderName: "토스 티셔츠 외 2건",
                 customerName: "김토스",
                 customerEmail: "customer123@gmail.com",
-                successUrl: `${window.location.origin}/success`,
-                failUrl: `${window.location.origin}/fail`,
+                successUrl: `${window.location.origin}/payment/success`,
+                failUrl: `${window.location.origin}/payment/fail`,
               });
             } catch (err) {
               console.log(err);

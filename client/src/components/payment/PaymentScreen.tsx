@@ -12,9 +12,8 @@ import { useState } from "react";
 import Payment from "./Payment";
 const Wrapper = styled.div`
   width: 100%;
-  min-height: 126vh;
+  min-height: 100vh;
   height: auto;
-  padding-bottom: 26vh;
   background: ${(props) => props.theme.bgImage};
   padding-top: 17vh;
 `;
