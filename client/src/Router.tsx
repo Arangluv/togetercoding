@@ -34,8 +34,8 @@ import Legal from "./pages/Legal";
 import TermsAndConditions from "./components/legal/TermsAndConditions";
 import PrivacyPolicy from "./components/legal/PrivacyPolicy";
 import RefundPolicy from "./components/legal/RefundPolicy";
-import Payment from "./components/payment/Payment";
 import Success from "./components/payment/Success";
+import Fail from "./components/payment/Fail";
 function Router() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["loginState"],
@@ -92,8 +92,8 @@ function Router() {
               <Route path="refund-policy" element={<RefundPolicy />} />
             </Route>
           </Route>
-          <Route path="/payment" element={<Payment />} />
           <Route path="/payment/success" element={<Success />} />
+          <Route path="/payment/fail" element={<Fail />} />
           <Route path="/kakao-login" element={<KakaoLoading />} />
           <Route path="/html-css-basic/lectures" element={<Lectures />}>
             <Route path=":lectureId" element={<LectureScreen />} />

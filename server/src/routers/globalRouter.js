@@ -6,6 +6,7 @@ import {
   postKakaoLogin,
   postLogin,
   postLogout,
+  postPaymentCheck,
   postReceiveAgainEmailVerification,
   tokenInspect,
 } from "../controllers/globalController";
@@ -23,4 +24,5 @@ globalRouter.route("/logout").post(postLogout);
 globalRouter
   .route("/receive-again-email-varification")
   .post(postReceiveAgainEmailVerification);
+globalRouter.route("/payment-check").post(postPaymentCheck);
 export default globalRouter;

@@ -84,15 +84,12 @@ export const postBuyLecture = async (req, res) => {
       buyer: buyer._id,
       course: lecture._id,
     });
-    console.log("Already?");
-    console.log(isAlreadyPurchased);
     if (isAlreadyPurchased) {
       // 이미 구매했으므로 lecture page로 redirect 시켜주어야함
       return res
         .status(200)
         .json({ message: "이미 구매했습니다", redirectName: lecture.urlName });
     }
-    console.log("여기 buyer 업데이트르 하나요?");
     await buyer.updateOne({
       $push: {
         lectureProgress: {

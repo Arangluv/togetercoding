@@ -6,6 +6,8 @@ import jwt from "jsonwebtoken";
 import { cookiesConfig } from "../config/cookieConfig";
 import axios from "axios";
 import MongoStore from "connect-mongo";
+import Lecture from "../models/Lecture";
+import Purchase from "../models/Purchase";
 const generateEmailVerificationToken = () => {
   const token = crypto.randomBytes(20).toString("hex");
   const expires = new Date();
@@ -123,9 +125,6 @@ export const tokenInspect = async (req, res) => {
     if (!req.session.user) {
       return res.status(200).json({ message: "로그인 되어 있지 않습니다" });
     }
-    console.log("token inspect");
-    console.log("req.session");
-    console.log(req.session);
     // req.session.user 에는 name과 id
     const student = await Student.findOne({
       _id: req.session.user.id,
@@ -508,4 +507,88 @@ export const postLogout = async (req, res) => {
 
 export const postReceiveAgainEmailVerification = async (req, res) => {
   postLogin();
+};
+
+export const postPaymentCheck = async (req, res) => {
+  const { paymentKey, amount, idempotencyKey, encodingSecretKey, orderId } =
+    req.body;
+  console.log("req.body");
+  console.log(req.body);
+  if (!req.session.user) {
+    return req
+      .status(404)
+      .json({ message: "결제를 처리하는데 문제가 발생했습니다." });
+  }
+  const { id: stdId } = req.session.user;
+  try {
+    const data = await axios({
+      url: "https://api.tosspayments.com/v1/payments/confirm",
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${encodingSecretKey}`,
+        "Content-Type": "application/json",
+        "Idempotency-Key": idempotencyKey,
+      },
+      data: {
+        paymentKey,
+        amount, // 정수타입이여야함
+        orderId,
+      },
+    }).then((result) => {
+      return result.data;
+    });
+    const {
+      orderName,
+      approvedAt,
+      easyPay,
+      receipt: { url: receiptUrl },
+      totalAmount,
+      method,
+    } = data;
+    const buyer = await Student.findById(stdId);
+    if (!buyer) {
+      return req
+        .status(404)
+        .json({ message: "결제를 처리하는데 문제가 발생했습니다." });
+    }
+    const lecture = await Lecture.findOne({ name: orderName });
+    if (!lecture) {
+      return res
+        .status(404)
+        .json({ message: "결제를 처리하는데 문제가 발생했습니다." });
+    }
+    const isAlreadyPurchased = await Purchase.exists({
+      buyer: buyer._id,
+      course: lecture._id,
+    });
+    if (isAlreadyPurchased) {
+      // 이미 구매했으므로 lecture page로 redirect 시켜주어야함
+      return res
+        .status(200)
+        .json({ message: "이미 구매했습니다", redirectName: lecture.urlName });
+    }
+    await buyer.updateOne({
+      $push: {
+        lectureProgress: {
+          lectureName: lecture.name,
+          completeLectureQuantity: 0,
+        },
+      },
+    });
+    await Purchase.create({
+      buyer: buyer._id,
+      course: lecture._id,
+      paymentAt: approvedAt,
+      receiptUrl,
+      amount: totalAmount,
+      method,
+    });
+    return res
+      .status(200)
+      .json({ orderId, orderName, totalAmount, method, approvedAt });
+  } catch (error) {
+    // console.log("error.data");
+    // console.log(error);
+    return res.status(404).json({ message: error?.response?.data?.message });
+  }
 };

@@ -114,3 +114,30 @@ export const postReceiveAgainEmailVerification = async (email: string) => {
     data: { email },
   });
 };
+interface PaymentDataProps {
+  paymentKey: string | null;
+  amount: number | null;
+  orderId: string | null;
+  idempotencyKey: string;
+  encodingSecretKey: string;
+}
+export const postPaymentCheck = async ({
+  orderId,
+  paymentKey,
+  amount,
+  idempotencyKey,
+  encodingSecretKey,
+}: PaymentDataProps) => {
+  return await axios({
+    url: `${BASE_URL}/payment-check`,
+    method: "POST",
+    withCredentials: true,
+    data: {
+      orderId,
+      paymentKey,
+      amount,
+      idempotencyKey,
+      encodingSecretKey,
+    },
+  });
+};

@@ -23,7 +23,7 @@ const EmptyNotice = styled.div`
 export default function PaymentHistory() {
   return (
     <Wrapper>
-      {false ? (
+      {true ? (
         <HistoryTable />
       ) : (
         <EmptyNotice>

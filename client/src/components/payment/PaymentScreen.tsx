@@ -191,16 +191,6 @@ export default function PaymentScreen() {
   const handlePurchaseLecture = (
     event: React.MouseEvent<HTMLLabelElement, MouseEvent>
   ) => {
-    //기존 임시 결제기능
-
-    // event.preventDefault();
-    // if (!email) {
-    //   navigator("/login");
-    //   toast.success("로그인 후 이용해주세요 :)");
-    //   return;
-    // }
-    // lecturePaymentMutate({ email, lectureName });
-
     event.preventDefault();
     // 로그인 안했으면 home으로
     if (!email) {
@@ -275,7 +265,7 @@ export default function PaymentScreen() {
         </PaymentWrapper>
       </Wrapper>
       <AnimatePresence>
-        {onPayment === "on" ? (
+        {onPayment === "on" && purchaseLectureInfo ? (
           <PaymenyOveray
             variants={variants}
             initial="start"
@@ -288,7 +278,7 @@ export default function PaymentScreen() {
               animate="end"
               exit="exit"
             >
-              <Payment />
+              <Payment lectureName={purchaseLectureInfo.name} />
             </TossWidgetWrapper>
           </PaymenyOveray>
         ) : null}

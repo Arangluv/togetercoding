@@ -6,8 +6,8 @@ import {
 import { nanoid } from "nanoid";
 import { useEffect, useRef } from "react";
 import { MdOutlineCancel } from "react-icons/md";
-import { useSetRecoilState } from "recoil";
-import { paymentStste } from "../../atom/atoms";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { paymentStste, studentLoginState } from "../../atom/atoms";
 const Wrapper = styled.div`
   width: 100%;
   height: 100%;
@@ -86,11 +86,16 @@ const PurchaseDetailContainer = styled.div`
     }
   }
 `;
-export default function Payment() {
+interface IProps {
+  lectureName: string;
+}
+export default function Payment({ lectureName }: IProps) {
   // Toss Payment
+  const stdLoginState = useRecoilValue(studentLoginState);
   const paymentWidgetRef = useRef<PaymentWidgetInstance | null>(null);
   const price = 1000; // 금액을 받아와야한다
   const clientKey = "test_ck_P24xLea5zVA69Mpa5glrQAMYNwW6";
+  // const clientKey = "test_ck_P24xLea5zVA69Mpa5glrQAMYNwW623";
   const customerKey = nanoid(); //회원 식별번호
   const setPaymentState = useSetRecoilState(paymentStste);
   useEffect(() => {
@@ -108,7 +113,7 @@ export default function Payment() {
       <PurchaseDetailContainer>
         <MdOutlineCancel onClick={() => setPaymentState("cancel")} />
         <h3>구매내용</h3>
-        <span id="purchase-content">기초부터 시작하는 html-css</span>
+        <span id="purchase-content">{lectureName}</span>
         <h3>결제금액</h3>
         <span id="purchase-price">99,000</span>
         <button
@@ -117,9 +122,9 @@ export default function Payment() {
             try {
               await paymentWidget?.requestPayment({
                 orderId: nanoid(),
-                orderName: "토스 티셔츠 외 2건",
-                customerName: "김토스",
-                customerEmail: "customer123@gmail.com",
+                orderName: `${lectureName}`,
+                customerName: `${stdLoginState.username}`,
+                customerEmail: `${stdLoginState.email}`,
                 successUrl: `${window.location.origin}/payment/success`,
                 failUrl: `${window.location.origin}/payment/fail`,
               });
