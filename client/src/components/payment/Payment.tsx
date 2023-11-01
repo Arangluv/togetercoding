@@ -8,6 +8,8 @@ import { useEffect, useRef } from "react";
 import { MdOutlineCancel } from "react-icons/md";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { paymentStste, studentLoginState } from "../../atom/atoms";
+import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "react-router-dom";
 const Wrapper = styled.div`
   width: 100%;
   height: 100%;
@@ -88,12 +90,14 @@ const PurchaseDetailContainer = styled.div`
 `;
 interface IProps {
   lectureName: string;
+  price: string;
 }
-export default function Payment({ lectureName }: IProps) {
+export default function Payment({ lectureName, price }: IProps) {
+  // url params
+  const urlName = useLocation().pathname.split("/")[1];
   // Toss Payment
   const stdLoginState = useRecoilValue(studentLoginState);
   const paymentWidgetRef = useRef<PaymentWidgetInstance | null>(null);
-  const price = 1000; // 금액을 받아와야한다
   const clientKey = "test_ck_P24xLea5zVA69Mpa5glrQAMYNwW6";
   // const clientKey = "test_ck_P24xLea5zVA69Mpa5glrQAMYNwW623";
   const customerKey = nanoid(); //회원 식별번호
@@ -102,7 +106,7 @@ export default function Payment({ lectureName }: IProps) {
     (async () => {
       const paymentWidget = await loadPaymentWidget(clientKey, customerKey);
 
-      paymentWidget.renderPaymentMethods("#payment-widget", price);
+      paymentWidget.renderPaymentMethods("#payment-widget", Number(price));
 
       paymentWidgetRef.current = paymentWidget;
     })();
@@ -115,7 +119,9 @@ export default function Payment({ lectureName }: IProps) {
         <h3>구매내용</h3>
         <span id="purchase-content">{lectureName}</span>
         <h3>결제금액</h3>
-        <span id="purchase-price">99,000</span>
+        <span id="purchase-price">
+          {price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+        </span>
         <button
           onClick={async () => {
             const paymentWidget = paymentWidgetRef.current;

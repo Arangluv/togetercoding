@@ -57,6 +57,22 @@ const SuccessBox = styled.div`
       font-weight: 600;
     }
   }
+  button {
+    margin-top: 10vw;
+    width: 30%;
+    background-color: ${(props) => props.theme.successColor};
+    color: white;
+    border: none;
+    padding: 1vw;
+    font-size: 1.5vw;
+    border-radius: 10px;
+    transition: all 0.1s ease-in-out;
+    /* font-weight: 600; */
+    &:hover {
+      cursor: pointer;
+      filter: brightness(1.1);
+    }
+  }
 `;
 interface SuccessProps {
   approvedAt: string;
@@ -64,6 +80,7 @@ interface SuccessProps {
   orderId: string;
   orderName: string;
   totalAmount: number;
+  lectureUrl: string;
 }
 
 export default function Success() {
@@ -89,19 +106,15 @@ export default function Success() {
         method: data.method,
         orderId: data.orderId,
         orderName: data.orderName,
+        lectureUrl: data.lectureUrl,
         totalAmount: data.totalAmount,
       };
       setSuccessData(newSuccessData);
       toast.success("결제에 성공했습니다");
     },
     onError: (error: any) => {
-      console.log("결제 실패시");
-      if (error?.response?.data?.message === "이미 처리된 결제입니다.") {
-        navigator("/");
-        return;
-      }
-      toast.error("결제를 처리하는데 문제가 발생했습니다");
-      console.log(error?.response?.data?.message);
+      toast.error(error?.response?.data?.message);
+      navigator(`/`);
     },
   });
   useEffect(() => {
@@ -124,15 +137,20 @@ export default function Success() {
               결제금액:{" "}
               <span>
                 {/* {Number(searchParams.get("amount")).toLocaleString()}원 */}
-                {Number(successData?.totalAmount)}
+                {`${Number(successData?.totalAmount)}원`}
               </span>
             </small>
             <small id="order-id">
               구매상품: <span>{successData?.orderName}</span>
             </small>
             <small id="order-id">
-              처리일자: <span>{successData?.approvedAt}</span>
+              처리일자: <span>{successData?.approvedAt.slice(0, 10)}</span>
             </small>
+            <button
+              onClick={() => navigator(`/${successData?.lectureUrl}/lectures`)}
+            >
+              강의바로가기
+            </button>
           </SuccessBox>
         </Overlay>
       )}

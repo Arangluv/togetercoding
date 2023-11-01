@@ -10,6 +10,7 @@ import { kakaoLogin, studentLogin } from "../api/api";
 import { studentLoginState } from "../atom/atoms";
 import { useEffect, useState } from "react";
 import { useReceiveAgainEmailVerificationMutate } from "../hooks/lecture";
+import LoadingWindow from "../components/LoadingWindow";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -267,81 +268,86 @@ export default function Login() {
     setLoginOk,
   });
   return (
-    <Wrapper>
-      <Title>같이코딩 로그인</Title>
-      {!loginOk ? (
-        <>
-          <Form onSubmit={handleSubmit(onValid)}>
-            <NameInfoBox>
-              <EmailLabel htmlFor="email">
-                <span>
-                  이메일
-                  {formState.errors.email ? (
-                    <small>{formState.errors.email.message}</small>
+    <>
+      <Wrapper>
+        <Title>같이코딩 로그인</Title>
+        {!loginOk ? (
+          <>
+            <Form onSubmit={handleSubmit(onValid)}>
+              <NameInfoBox>
+                <EmailLabel htmlFor="email">
+                  <span>
+                    이메일
+                    {formState.errors.email ? (
+                      <small>{formState.errors.email.message}</small>
+                    ) : null}
+                  </span>
+                  <input
+                    {...register("email", {
+                      required: "이메일을 입력해주세요",
+                      pattern: {
+                        value:
+                          /^[a-zA-Z0-9+-\_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
+                        message: "이메일 형식이어야 합니다",
+                      },
+                    })}
+                    placeholder="example@naver.com"
+                    id="email"
+                    type="text"
+                    onFocus={() => clearErrors("extraError")}
+                  />
+                </EmailLabel>
+              </NameInfoBox>
+              <SubmitLabel htmlFor="login_submit">
+                <span>로그인</span>
+                <input disabled={isLoading} type="submit" id="login_submit" />
+              </SubmitLabel>
+              <JoinLabel onClick={() => navigator("/join")}>
+                <span>회원가입</span>
+              </JoinLabel>
+              <ForgetEmailBox>
+                <Link to="#">
+                  이메일을 까먹었어요
+                  <AiOutlineArrowRight />
+                </Link>
+              </ForgetEmailBox>
+              {formState.errors.extraError ? (
+                <ExtraError>
+                  <span>{formState.errors.extraError.message}</span>
+                  {formState.errors.extraError.message ===
+                  "이메일 인증을 먼저 진행해주세요" ? (
+                    <small onClick={() => receiveAgainMutate()}>
+                      인증링크 다시받기
+                    </small>
                   ) : null}
-                </span>
-                <input
-                  {...register("email", {
-                    required: "이메일을 입력해주세요",
-                    pattern: {
-                      value:
-                        /^[a-zA-Z0-9+-\_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
-                      message: "이메일 형식이어야 합니다",
-                    },
-                  })}
-                  placeholder="example@naver.com"
-                  id="email"
-                  type="text"
-                  onFocus={() => clearErrors("extraError")}
-                />
-              </EmailLabel>
-            </NameInfoBox>
-            <SubmitLabel htmlFor="login_submit">
-              <span>로그인</span>
-              <input disabled={isLoading} type="submit" id="login_submit" />
-            </SubmitLabel>
-            <JoinLabel onClick={() => navigator("/join")}>
-              <span>회원가입</span>
-            </JoinLabel>
-            <ForgetEmailBox>
-              <Link to="#">
-                이메일을 까먹었어요
-                <AiOutlineArrowRight />
-              </Link>
-            </ForgetEmailBox>
-            {formState.errors.extraError ? (
-              <ExtraError>
-                <span>{formState.errors.extraError.message}</span>
-                {formState.errors.extraError.message ===
-                "이메일 인증을 먼저 진행해주세요" ? (
-                  <small onClick={() => receiveAgainMutate()}>
-                    인증링크 다시받기
-                  </small>
-                ) : null}
-              </ExtraError>
-            ) : null}
-          </Form>
-          <BorderBox>
-            <div className="border_div"></div>
-            <span>OR</span>
-            <div className="border_div"></div>
-          </BorderBox>
-          <KakaoLoginLink
-            href={`https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_KAKAO_API_KEY}&redirect_uri=${process.env.REACT_APP_KAKAO_LOGIN_REDIRECT_URL}&response_type=code`}
-          >
-            <SiKakaotalk />
-            카카오톡으로 로그인
-          </KakaoLoginLink>
-        </>
-      ) : (
-        <LoginOkContainer>
-          <AiOutlineCheckCircle />
-          <span>
-            <span>{`${watch("email")}`}</span>로 인증링크를 보냈습니다
-          </span>
-          <small>이메일에 보낸 인증링크를 클릭하여 로그인을 완료해주세요</small>
-        </LoginOkContainer>
-      )}
-    </Wrapper>
+                </ExtraError>
+              ) : null}
+            </Form>
+            <BorderBox>
+              <div className="border_div"></div>
+              <span>OR</span>
+              <div className="border_div"></div>
+            </BorderBox>
+            <KakaoLoginLink
+              href={`https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_KAKAO_API_KEY}&redirect_uri=${process.env.REACT_APP_KAKAO_LOGIN_REDIRECT_URL}&response_type=code`}
+            >
+              <SiKakaotalk />
+              카카오톡으로 로그인
+            </KakaoLoginLink>
+          </>
+        ) : (
+          <LoginOkContainer>
+            <AiOutlineCheckCircle />
+            <span>
+              <span>{`${watch("email")}`}</span>로 인증링크를 보냈습니다
+            </span>
+            <small>
+              이메일에 보낸 인증링크를 클릭하여 로그인을 완료해주세요
+            </small>
+          </LoginOkContainer>
+        )}
+      </Wrapper>
+      {isLoading ? <LoadingWindow loading={isLoading} /> : null}
+    </>
   );
 }

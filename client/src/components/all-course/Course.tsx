@@ -1,8 +1,6 @@
 import styled from "styled-components";
-import { motion } from "framer-motion";
-import { StringLiteral } from "typescript";
 import { useNavigate } from "react-router-dom";
-const CourseContainer = styled(motion.article)<ToggleState>`
+const CourseContainer = styled.article<ToggleState>`
   width: 100%;
   height: ${(props) => (props.toggleState === "list" ? "20vw" : "25vw")};
   border-radius: 10px;
@@ -14,27 +12,35 @@ const CourseContainer = styled(motion.article)<ToggleState>`
   &:hover {
     cursor: pointer;
   }
+  &:hover img {
+    transform: scale(1.05);
+  }
 `;
 const CourseImageBox = styled.div<ToggleState>`
   width: ${(props) => (props.toggleState === "list" ? "40%" : "100%")};
-  height: 100%;
+  height: ${(props) => (props.toggleState === "list" ? "100%" : "70%")};
+  overflow: hidden;
   border-top-left-radius: 10px;
-  border-bottom-left-radius: 10px;
+  border-top-right-radius: ${(props) =>
+    props.toggleState === "list" ? "0px" : "10px"};
+  border-bottom-left-radius: ${(props) =>
+    props.toggleState === "list" ? "10px" : "0px"};
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
+    transition: transform 0.2s ease-in-out;
   }
 `;
 const CourseInfoBox = styled.div<ToggleState>`
   width: ${(props) => (props.toggleState === "list" ? "60%" : "100%")};
-  height: 100%;
+  height: ${(props) => (props.toggleState === "list" ? "100%" : "30%")};
   padding: 2vw;
   padding-left: 3vw;
   display: flex;
   flex-direction: column;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
   align-items: ${(props) =>
     props.toggleState === "list" ? "baseline" : "center"};
   position: relative;
@@ -103,7 +109,6 @@ export default function Course({
   const navigator = useNavigate();
   return (
     <CourseContainer
-      whileHover={{ scale: 1.02 }}
       toggleState={toggleState}
       onClick={() => navigator(`/${urlName}`)}
     >

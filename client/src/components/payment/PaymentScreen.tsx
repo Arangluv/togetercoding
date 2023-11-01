@@ -38,7 +38,7 @@ const PaymentSummary = styled.div`
   }
   #lecture-thumbnail__container {
     width: 100%;
-    height: 50%;
+    height: 40vh;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -47,6 +47,7 @@ const PaymentSummary = styled.div`
   #lecture-image-box {
     width: 100%;
     height: 100%;
+    overflow: hidden;
     img {
       width: 100%;
       height: 100%;
@@ -67,8 +68,9 @@ const PaymentSummary = styled.div`
     padding: 0 2vw;
     color: ${(props) => props.theme.textColor};
     h4 {
-      font-size: 1.3vw;
+      font-size: 1.4vw;
       margin-bottom: 1vw;
+      font-weight: 600;
     }
     span {
       font-size: 1.2vw;
@@ -181,6 +183,7 @@ export default function PaymentScreen() {
     navigator,
     urlName
   );
+
   const { email } = useRecoilValue(studentLoginState);
   const lectureName = useLocation().pathname.split("/")[1];
   const purchaseLectureInfo = usePurchaseLectureInfoQuery(
@@ -249,7 +252,10 @@ export default function PaymentScreen() {
               <div id="purchase-info">
                 <span>결제금액</span>
                 <small>
-                  <span>₩</span>350,000
+                  <span>₩</span>
+                  {purchaseLectureInfo?.price
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                 </small>
               </div>
               <label
@@ -278,7 +284,10 @@ export default function PaymentScreen() {
               animate="end"
               exit="exit"
             >
-              <Payment lectureName={purchaseLectureInfo.name} />
+              <Payment
+                price={purchaseLectureInfo.price}
+                lectureName={purchaseLectureInfo.name}
+              />
             </TossWidgetWrapper>
           </PaymenyOveray>
         ) : null}

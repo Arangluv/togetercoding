@@ -41,7 +41,8 @@ const NameLabel = styled.label`
       margin-left: 1vw;
     }
   }
-  input[type="text"] {
+  input[type="text"],
+  input[type="number"] {
     &:focus {
       outline: none;
     }
@@ -55,6 +56,11 @@ const NameLabel = styled.label`
     border-radius: 10px;
     color: ${(props) => props.theme.textColor};
     font-size: 1.2vw;
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
   textarea {
     &:focus {
@@ -153,6 +159,7 @@ const SubmitLabel = styled.label`
 interface DProps {
   name: string;
   subName: string; //add
+  price: number;
   urlName: string; //add
   description: string; //add
   lectureTag: string; //add
@@ -172,6 +179,7 @@ export default function MakeLecture() {
     formData.append("urlName", data.urlName);
     formData.append("description", data.description);
     formData.append("lectureTag", data.lectureTag);
+    formData.append("price", data.price.toString());
     if (data.thumbnail.length !== 0) {
       formData.append("lecture-thumbnail", data.thumbnail[0]);
     }
@@ -218,6 +226,23 @@ export default function MakeLecture() {
             id="subName"
             type="text"
             placeholder="서브타이틀을 적어주세요"
+          />
+        </NameLabel>
+        <NameLabel htmlFor="price">
+          <span>
+            가격
+            {formState.errors.price ? (
+              <small>{formState.errors.price.message}</small>
+            ) : null}
+          </span>
+          <input
+            {...register("price", {
+              required: "가격을 입력해주세요",
+            })}
+            id="price"
+            type="number"
+            min={0}
+            placeholder="가격을 적어주세요"
           />
         </NameLabel>
         <NameLabel htmlFor="urlName">

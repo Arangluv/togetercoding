@@ -583,9 +583,14 @@ export const postPaymentCheck = async (req, res) => {
       amount: totalAmount,
       method,
     });
-    return res
-      .status(200)
-      .json({ orderId, orderName, totalAmount, method, approvedAt });
+    return res.status(200).json({
+      orderId,
+      orderName,
+      totalAmount,
+      method,
+      approvedAt,
+      lectureUrl: lecture.urlName,
+    });
   } catch (error) {
     // console.log("error.data");
     // console.log(error);

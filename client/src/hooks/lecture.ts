@@ -575,6 +575,7 @@ interface PurchaseInfoProps {
   name: string;
   subName: string;
   lectureThumbnail: string;
+  price: string;
 }
 export const usePurchaseLectureInfoQuery = (
   lectureName: string,

@@ -35,7 +35,7 @@ export const getAllLecture = async (req, res) => {
 
 export const postMakeLecture = async (req, res) => {
   console.log(req.body);
-  const { name, subName, urlName, description, lectureTag } = req.body;
+  const { name, subName, urlName, description, lectureTag, price } = req.body;
   const { location } = req.file;
   try {
     const tagArr = lectureTag
@@ -50,6 +50,7 @@ export const postMakeLecture = async (req, res) => {
       description,
       lectureTag: tagArr,
       thumbnail: location,
+      price: Number(price),
     });
     return res.status(200).json({ message: "강의를 만들었습니다" });
   } catch (error) {
@@ -1003,23 +1004,27 @@ export const getPurchaseLectureInfo = async (req, res) => {
       const purchase = await Purchase.find({ buyer: id }).populate({
         path: "course",
         model: "Lecture",
-        match: { name: "기초부터 배우는 html-css" }, // Lecture에서 이름이 일치하는 것만 선택
+        match: { name: lecture.name }, // Lecture에서 이름이 일치하는 것만 선택
       });
       if (purchase.length === 0) {
         return res.status(200).json({
           name: lecture.name,
           subName: lecture.subName,
           lectureThumbnail: lecture.thumbnail,
+          price: lecture.price,
         });
       }
       return res
         .status(200)
         .json({ message: "이미 구매했습니다", redirectName: lecture.urlName });
     }
+    console.log("lecture?");
+    console.log(lecture);
     return res.status(200).json({
       name: lecture.name,
       subName: lecture.subName,
       lectureThumbnail: lecture.thumbnail,
+      price: lecture.price,
     });
   } catch (error) {
     console.log("구매강의의 정보를 불러오는데 오류가 발생했습니다");
