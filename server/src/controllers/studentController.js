@@ -70,8 +70,6 @@ export const postBuyLecture = async (req, res) => {
       name: req.session.user.name,
       email,
     });
-    console.log("buyer");
-    console.log(buyer);
     if (!buyer) {
       return res.status(404).send();
     }
@@ -139,5 +137,23 @@ export const getWriteNote = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(404).send();
+  }
+};
+
+export const getPurchaseData = async (req, res) => {
+  const { id: stdId } = req.session?.user;
+  try {
+    if (!stdId) {
+      return res
+        .status(404)
+        .json({ message: "구매 데이터를 불러오는데 문제가 발생했습니다" });
+    }
+    const purchases = await Purchase.find({ buyer: stdId });
+    return res.status(200).json({ purchases });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(404)
+      .json({ message: "구매 데이터를 불러오는데 문제가 발생했습니다" });
   }
 };

@@ -3,6 +3,7 @@ import AWS from "aws-sdk";
 import multer from "multer";
 import multerS3 from "multer-s3";
 import {
+  getPurchaseData,
   getWriteIssue,
   getWriteNote,
   postBuyLecture,
@@ -35,4 +36,5 @@ studentRouter
 studentRouter.route("/buy-lectures").post(postBuyLecture);
 studentRouter.route("/issues").get(getWriteIssue);
 studentRouter.route("/notes").get(getWriteNote);
+studentRouter.route("/purchase-history").get(getPurchaseData);
 export default studentRouter;

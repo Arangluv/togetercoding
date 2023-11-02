@@ -1018,8 +1018,6 @@ export const getPurchaseLectureInfo = async (req, res) => {
         .status(200)
         .json({ message: "이미 구매했습니다", redirectName: lecture.urlName });
     }
-    console.log("lecture?");
-    console.log(lecture);
     return res.status(200).json({
       name: lecture.name,
       subName: lecture.subName,

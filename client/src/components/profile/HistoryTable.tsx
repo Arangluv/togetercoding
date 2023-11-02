@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import { usePurchasesHistoryQuery } from "../../hooks/lecture";
 const Wrapper = styled.div`
   width: 100%;
   min-height: 40vh;
@@ -20,16 +21,14 @@ const Title = styled.div`
 `;
 const Table = styled.table`
   width: 100%;
-  height: 35vh;
+  height: auto;
   border-collapse: collapse;
   margin-top: 2vw;
   border-radius: 10px;
-
   td,
   th,
   tr {
     color: white;
-
     padding: 1.5vw 0;
     text-align: center;
   }
@@ -46,6 +45,9 @@ const Table = styled.table`
   }
   td {
     margin: 0;
+    a {
+      color: white;
+    }
     svg:hover {
       cursor: pointer;
       color: #5352ed;
@@ -59,7 +61,17 @@ const Table = styled.table`
     background-color: #57606f;
   }
 `;
-export default function HistoryTable() {
+interface IProps {
+  purchaseData: DProps[] | undefined;
+}
+interface DProps {
+  paymentAt: string;
+  receiptUrl: string;
+  amount: number;
+  method: string;
+  lectureName: string;
+}
+export default function HistoryTable({ purchaseData }: IProps) {
   return (
     <Wrapper>
       <Title>
@@ -76,42 +88,28 @@ export default function HistoryTable() {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>React로 수익화 웹서비스 만들기</td>
-            <td>120,000₩</td>
-            <td>2023.07.04 09시</td>
-            <td>카드</td>
-            <td>
-              <ReceiptLongIcon />
-            </td>
-          </tr>
-          <tr>
-            <td>React로 수익화 웹서비스 만들기</td>
-            <td>120,000₩</td>
-            <td>2023.07.04 09시</td>
-            <td>카드</td>
-            <td>
-              <ReceiptLongIcon />
-            </td>
-          </tr>
-          <tr>
-            <td>React로 수익화 웹서비스 만들기</td>
-            <td>120,000₩</td>
-            <td>2023.07.04 09시</td>
-            <td>카드</td>
-            <td>
-              <ReceiptLongIcon />
-            </td>
-          </tr>
-          <tr>
-            <td>React로 수익화 웹서비스 만들기</td>
-            <td>120,000₩</td>
-            <td>2023.07.04 09시</td>
-            <td>카드</td>
-            <td>
-              <ReceiptLongIcon />
-            </td>
-          </tr>
+          {purchaseData
+            ? purchaseData.map((history) => {
+                return (
+                  <tr>
+                    <td style={{ width: "40%" }}>{history.lectureName} </td>
+                    <td>
+                      {history.amount
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                      ₩
+                    </td>
+                    <td>{history.paymentAt.slice(0, 10)}</td>
+                    <td>{history.method}</td>
+                    <td>
+                      <a href={history.receiptUrl}>
+                        <ReceiptLongIcon />
+                      </a>
+                    </td>
+                  </tr>
+                );
+              })
+            : null}
         </tbody>
       </Table>
     </Wrapper>

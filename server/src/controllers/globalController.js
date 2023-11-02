@@ -582,6 +582,7 @@ export const postPaymentCheck = async (req, res) => {
       receiptUrl,
       amount: totalAmount,
       method,
+      lectureName: lecture.name,
     });
     return res.status(200).json({
       orderId,

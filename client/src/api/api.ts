@@ -141,3 +141,11 @@ export const postPaymentCheck = async ({
     },
   });
 };
+
+export const getPurchasesHistory = async () => {
+  return await axios({
+    url: `${BASE_URL}/students/purchase-history`,
+    method: "GET",
+    withCredentials: true,
+  }).then((result) => result.data?.purchases);
+};

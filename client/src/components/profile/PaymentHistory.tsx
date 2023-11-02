@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import HistoryTable from "./HistoryTable";
+import { usePurchasesHistoryQuery } from "../../hooks/lecture";
 
 const Wrapper = styled.div`
   width: 80%;
@@ -21,10 +22,11 @@ const EmptyNotice = styled.div`
   }
 `;
 export default function PaymentHistory() {
+  const purchaseData = usePurchasesHistoryQuery();
   return (
     <Wrapper>
-      {true ? (
-        <HistoryTable />
+      {purchaseData?.length ? (
+        <HistoryTable purchaseData={purchaseData} />
       ) : (
         <EmptyNotice>
           <span>불러올 결제 내역이 없습니다 :)</span>

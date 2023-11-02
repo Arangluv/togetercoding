@@ -25,6 +25,7 @@ import {
 import { toast } from "react-toastify";
 import { NavigateFunction } from "react-router-dom";
 import {
+  getPurchasesHistory,
   getStudenWritetNote,
   getUserIssue,
   lecturePayment,
@@ -611,4 +612,22 @@ export const useReceiveAgainEmailVerificationMutate = ({
     },
   });
   return receiveAgainMutate;
+};
+interface PurchaseHistoryProps {
+  paymentAt: string;
+  receiptUrl: string;
+  amount: number;
+  method: string;
+  lectureName: string;
+}
+export const usePurchasesHistoryQuery = () => {
+  const { data: purchaseData } = useQuery<PurchaseHistoryProps[]>(
+    ["purchasesHistory"],
+    () => getPurchasesHistory(),
+    {
+      staleTime: 1000 * 60 * 5,
+      cacheTime: Infinity,
+    }
+  );
+  return purchaseData;
 };

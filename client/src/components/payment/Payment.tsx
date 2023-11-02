@@ -93,8 +93,6 @@ interface IProps {
   price: string;
 }
 export default function Payment({ lectureName, price }: IProps) {
-  // url params
-  const urlName = useLocation().pathname.split("/")[1];
   // Toss Payment
   const stdLoginState = useRecoilValue(studentLoginState);
   const paymentWidgetRef = useRef<PaymentWidgetInstance | null>(null);
