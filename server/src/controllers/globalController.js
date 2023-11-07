@@ -24,7 +24,7 @@ export const postJoin = async (req, res) => {
       port: 465, // SMTP 포트
       auth: {
         user: "ruhunsu3@naver.com", // mail 발송 이메일 주소
-        pass: "ru09457295#@", // 해당 이메일 비밀번호
+        pass: "ru09457295@@", // 해당 이메일 비밀번호
       },
     });
 
@@ -121,9 +121,17 @@ export const getEmailVerification = async (req, res) => {
 };
 
 export const tokenInspect = async (req, res) => {
+  console.log("req.session.id");
+  console.log(req.session.id);
   try {
     if (!req.session.user) {
-      return res.status(200).json({ message: "로그인 되어 있지 않습니다" });
+      return res.status(200).json({
+        message: "로그인 되어 있지 않습니다",
+        name: "",
+        nickname: "",
+        profileImg: "",
+        email: "",
+      });
     }
     // req.session.user 에는 name과 id
     const student = await Student.findOne({
@@ -188,7 +196,7 @@ export const postLogin = async (req, res) => {
       port: 465, // SMTP 포트
       auth: {
         user: "ruhunsu3@naver.com", // mail 발송 이메일 주소
-        pass: "ru09457295#@", // 해당 이메일 비밀번호
+        pass: "ru09457295@@", // 해당 이메일 비밀번호
       },
     });
     // 이메일 인증 토큰과 만료시간을 받아옴
@@ -478,7 +486,7 @@ export const postLogout = async (req, res) => {
       req.session.destroy((err) => {
         if (err) {
           console.log(err);
-          throw new Error("???");
+          throw new Error("세션을 삭제하는데 오류가 발생했습니다");
         }
 
         const store = new MongoStore({
@@ -495,7 +503,7 @@ export const postLogout = async (req, res) => {
           .json({ message: "로그아웃했습니다" });
       });
     } else {
-      throw new Error("??");
+      throw new Error("세션을 삭제하는데 오류가 발생했습니다");
     }
   } catch (error) {
     console.log(error);

@@ -1,14 +1,11 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
-import {
-  useLecturePaymentMutataion,
-  usePurchaseLectureInfoQuery,
-} from "../../hooks/lecture";
+import { usePurchaseLectureInfoQuery } from "../../hooks/lecture";
 import { paymentStste, studentLoginState } from "../../atom/atoms";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Payment from "./Payment";
 const Wrapper = styled.div`
   width: 100%;
@@ -179,14 +176,9 @@ export default function PaymentScreen() {
 
   const navigator = useNavigate();
   const urlName = useLocation().pathname.split("/")[1];
-  const { lecturePaymentMutate, paymentLoading } = useLecturePaymentMutataion(
-    navigator,
-    urlName
-  );
-
   const { email } = useRecoilValue(studentLoginState);
   const lectureName = useLocation().pathname.split("/")[1];
-  const purchaseLectureInfo = usePurchaseLectureInfoQuery(
+  const { purchaseLectureInfo, isError } = usePurchaseLectureInfoQuery(
     lectureName,
     navigator
   );
@@ -203,7 +195,11 @@ export default function PaymentScreen() {
     }
     setOnPaymeny("on");
   };
-
+  useEffect(() => {
+    if (isError) {
+      navigator("/");
+    }
+  }, [isError]);
   return (
     <>
       <Wrapper>
@@ -235,7 +231,7 @@ export default function PaymentScreen() {
           </PaymentSummary>
           <PaymentSelect>
             <h3>결제수단 선택</h3>
-            <form action="">
+            <form >
               <label htmlFor="card">
                 <input id="card" type="radio" name="payment-method" />
                 <span>카드결제</span>

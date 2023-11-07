@@ -23,6 +23,7 @@ import {
   postReply,
   putLectureComplete,
 } from "../controllers/lectureController";
+import { isPurchase, onlyLoginAccess } from "../middleware/auth";
 import AWS from "aws-sdk";
 import multer from "multer";
 import multerS3 from "multer-s3";
@@ -72,8 +73,14 @@ lectureRouter.route("/delete-maintheme").delete(deleteMainTheme);
 lectureRouter.route("/sub-lectures").get(getSubLecture);
 lectureRouter.route("/delete-sub-lecture").delete(deleteSubLecture);
 lectureRouter.route("/listen-lectures").get(getListenLecture);
-lectureRouter.route("/lecture-title").get(getLectureTitle);
-lectureRouter.route("/lecture-list").get(getLectureList);
+
+// 학생들이 구매한 강의를 클릭
+lectureRouter
+  .route("/lecture-title")
+  .get(onlyLoginAccess, isPurchase, getLectureTitle);
+lectureRouter
+  .route("/lecture-list")
+  .get(onlyLoginAccess, isPurchase, getLectureList);
 lectureRouter.route("/complete-lecture").put(putLectureComplete);
 lectureRouter.route("/comments").post(postComment);
 lectureRouter.route("/std-comments").get(getComment);

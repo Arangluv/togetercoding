@@ -71,25 +71,6 @@ export const profileChange = async (data: FormData) => {
   });
 };
 
-export const lecturePayment = async ({
-  email,
-  lectureName,
-}: BuyLectureProps) => {
-  return await axios({
-    url: `${BASE_URL}/students/buy-lectures`,
-    method: "POST",
-    withCredentials: true,
-    headers: {
-      "Access-Control-Allow-Origin": `http://localhost:3000`,
-      "Access-Control-Allow-Credentials": true,
-    },
-    data: {
-      email,
-      lectureName,
-    },
-  });
-};
-
 export const getUserIssue = async () => {
   return await axios({
     url: `${BASE_URL}/students/issues`,

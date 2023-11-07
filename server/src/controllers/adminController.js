@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { cookiesConfig } from "../config/cookieConfig";
 import AWS from "aws-sdk";
 import MongoStore from "connect-mongo";
+import Purchase from "../models/Purchase";
 
 export const tokenCheck = async (req, res) => {
   try {
@@ -88,5 +89,15 @@ export const refreshTokenInspect = async (req, res) => {
       .cookie("token", { maxAge: 0 })
       .status(404)
       .json({ errorCode: -1 });
+  }
+};
+
+export const getPaymentStatus = async (req, res) => {
+  try {
+    const purchases = await Purchase.find({}).populate("buyer");
+    return res.status(200).json({ purchases });
+  } catch (error) {
+    console.log(error);
+    return res.status(404).send();
   }
 };

@@ -4,12 +4,10 @@ import {
   PaymentWidgetInstance,
 } from "@tosspayments/payment-widget-sdk";
 import { nanoid } from "nanoid";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MdOutlineCancel } from "react-icons/md";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { paymentStste, studentLoginState } from "../../atom/atoms";
-import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "react-router-dom";
 const Wrapper = styled.div`
   width: 100%;
   height: 100%;
@@ -70,6 +68,18 @@ const PurchaseDetailContainer = styled.div`
       cursor: pointer;
     }
   }
+  #payment-err {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 7vw;
+    font-size: 1.3vw;
+    display: block;
+    width: 90%;
+    text-align: center;
+    color: ${(props) => props.theme.errorColor};
+    font-weight: 600;
+  }
   button {
     position: absolute;
     left: 50%;
@@ -81,7 +91,7 @@ const PurchaseDetailContainer = styled.div`
     border-radius: 10px;
     width: 90%;
     bottom: 2vw;
-    transition: all 0.1s ease-in-out;
+    transition: all 0.2s ease-in-out;
     &:hover {
       cursor: pointer;
       filter: brightness(1.1);
@@ -100,11 +110,14 @@ export default function Payment({ lectureName, price }: IProps) {
   // const clientKey = "test_ck_P24xLea5zVA69Mpa5glrQAMYNwW623";
   const customerKey = nanoid(); //회원 식별번호
   const setPaymentState = useSetRecoilState(paymentStste);
+  const [paymentErr, setPaymentErr] = useState<null | string>(null);
+
   useEffect(() => {
     (async () => {
       const paymentWidget = await loadPaymentWidget(clientKey, customerKey);
 
-      paymentWidget.renderPaymentMethods("#payment-widget", Number(price));
+      // paymentWidget.renderPaymentMethods("#payment-widget", Number(price));
+      paymentWidget.renderPaymentMethods("#payment-widget", 1000);
 
       paymentWidgetRef.current = paymentWidget;
     })();
@@ -120,6 +133,7 @@ export default function Payment({ lectureName, price }: IProps) {
         <span id="purchase-price">
           {price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
         </span>
+        {paymentErr ? <span id="payment-err">{paymentErr}</span> : null}
         <button
           onClick={async () => {
             const paymentWidget = paymentWidgetRef.current;
@@ -132,8 +146,10 @@ export default function Payment({ lectureName, price }: IProps) {
                 successUrl: `${window.location.origin}/payment/success`,
                 failUrl: `${window.location.origin}/payment/fail`,
               });
-            } catch (err) {
+            } catch (err: any) {
               console.log(err);
+              console.log(err?.message);
+              setPaymentErr(err?.message);
             }
           }}
         >

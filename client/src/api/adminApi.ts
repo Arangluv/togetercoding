@@ -4,7 +4,7 @@ import { BASE_URL } from "../utill/url";
 //   ? JSON.parse(decodeURIComponent(document.cookie).split("j:")[1]).accessToken
 //   : "";
 export const adminTokenCheck = async () => {
-  return axios({
+  return await axios({
     url: `${BASE_URL}/admin/token-check`,
     method: "GET",
     withCredentials: true,
@@ -16,4 +16,12 @@ export const adminTokenCheck = async () => {
       console.log(error);
       return null;
     });
+};
+
+export const getPaymentStatus = async () => {
+  return await axios({
+    url: `${BASE_URL}/admin/payment-status`,
+    method: "GET",
+    withCredentials: true,
+  }).then((result) => result?.data.purchases);
 };

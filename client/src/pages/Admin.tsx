@@ -56,6 +56,9 @@ export default function Admin() {
         <li>
           <Link to="issues">이슈</Link>
         </li>
+        <li>
+          <Link to="payment-status">결제상황</Link>
+        </li>
       </List>
       <Outlet />
     </Wrapper>

@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import LectureList from "./LectureList";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { useLectureTitleQuery } from "../../hooks/lecture";
 
 const Wrapper = styled.div`

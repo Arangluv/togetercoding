@@ -1025,7 +1025,6 @@ export const getPurchaseLectureInfo = async (req, res) => {
       price: lecture.price,
     });
   } catch (error) {
-    console.log("구매강의의 정보를 불러오는데 오류가 발생했습니다");
     return res.status(404).send();
   }
 };

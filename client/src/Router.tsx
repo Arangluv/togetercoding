@@ -36,6 +36,7 @@ import PrivacyPolicy from "./components/legal/PrivacyPolicy";
 import RefundPolicy from "./components/legal/RefundPolicy";
 import Success from "./components/payment/Success";
 import Fail from "./components/payment/Fail";
+import PaymentStatus from "./components/admin/PaymentStatus";
 function Router() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["loginState"],
@@ -95,7 +96,7 @@ function Router() {
           <Route path="/payment/success" element={<Success />} />
           <Route path="/payment/fail" element={<Fail />} />
           <Route path="/kakao-login" element={<KakaoLoading />} />
-          <Route path="/html-css-basic/lectures" element={<Lectures />}>
+          <Route path="/:urlName/lectures" element={<Lectures />}>
             <Route path=":lectureId" element={<LectureScreen />} />
           </Route>
           <Route path="/admin-panel" element={<Admin />}>
@@ -104,6 +105,7 @@ function Router() {
             <Route path="make-lecture" element={<MakeLecture />} />
             <Route path="issues" element={<StudentIssue />} />
             <Route path="comments" element={<StudentComment />} />
+            <Route path="payment-status" element={<PaymentStatus />} />
           </Route>
           <Route
             path={"/admin-panel/upload-lecture/:lectureId"}

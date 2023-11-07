@@ -28,11 +28,11 @@ import {
   getPurchasesHistory,
   getStudenWritetNote,
   getUserIssue,
-  lecturePayment,
   postReceiveAgainEmailVerification,
 } from "../api/api";
 import { UseFormSetValue } from "react-hook-form";
 import { getAllComment } from "../api/lectureApi";
+import { getPaymentStatus } from "../api/adminApi";
 
 interface LectureItemProps {
   _id: string;
@@ -231,30 +231,6 @@ export const useSubLectureRemoveMutation = ({
   return subLectureRemoveMutate;
 };
 
-export const useLecturePaymentMutataion = (
-  navigator: NavigateFunction,
-  urlName: string
-) => {
-  const { mutate: lecturePaymentMutate, isLoading: paymentLoading } =
-    useMutation({
-      mutationFn: lecturePayment,
-      onSuccess: (data) => {
-        console.log("data");
-        console.log(data);
-        if (data?.data?.redirectName) {
-          navigator(`/${data?.data.redirectName}/lectures`);
-          return;
-        }
-        toast.success("임시적으로 구매 성공!");
-        navigator(`/${urlName}/lectures`);
-      },
-      onError: () => {
-        toast.error("구매하는데 문제가 발생 ㅠ.ㅠ");
-      },
-    });
-  return { lecturePaymentMutate, paymentLoading };
-};
-
 export const useListenLectureQuery = ({
   studentEmail,
 }: ListenLectureIProps) => {
@@ -278,6 +254,7 @@ export const useLectureTitleQuery = (urlName: string) => {
         enabled: urlName === "" ? false : true,
         staleTime: 1000 * 60 * 5,
         cacheTime: Infinity,
+        retry: false,
       }
     );
   return { lectureTitleData, lectureTitleDataLoading };
@@ -291,6 +268,7 @@ export const useLectureListQuery = (urlName: string) => {
       enabled: urlName === "" ? false : true,
       staleTime: 1000 * 60 * 5,
       cacheTime: Infinity,
+      retry: false,
     }
   );
   return lectureListData;
@@ -582,7 +560,7 @@ export const usePurchaseLectureInfoQuery = (
   lectureName: string,
   navigator: NavigateFunction
 ) => {
-  const { data: purchaseLectureInfo } = useQuery<PurchaseInfoProps>(
+  const { data: purchaseLectureInfo, isError } = useQuery<PurchaseInfoProps>(
     ["purchaseInfo", lectureName],
     () => getPurchaseLectureInfo(lectureName, navigator),
     {
@@ -591,7 +569,9 @@ export const usePurchaseLectureInfoQuery = (
       cacheTime: Infinity,
     }
   );
-  return purchaseLectureInfo;
+  console.log("hook에서 isError");
+  console.log(isError);
+  return { purchaseLectureInfo, isError };
 };
 
 interface ReceiveAgainEmailVerificationProps {
@@ -630,4 +610,28 @@ export const usePurchasesHistoryQuery = () => {
     }
   );
   return purchaseData;
+};
+
+interface PaymentStatusProps {
+  _id: string;
+  amount: number;
+  lectureName: string;
+  method: string;
+  paymentAt: string;
+  receiptUrl: string;
+  buyer: {
+    email: string;
+    name: string;
+  };
+}
+export const useStudentPaymentStatusQuery = () => {
+  const { data: payementStatusData } = useQuery<PaymentStatusProps[]>(
+    ["admin", "payment-status"],
+    getPaymentStatus,
+    {
+      staleTime: 1000 * 60 * 5,
+      cacheTime: Infinity,
+    }
+  );
+  return payementStatusData;
 };
