@@ -12,54 +12,111 @@
   <br/>
 ## 서비스 동작
 ### 메인 페이지
-|Home|Forest|
+<p align="center">
+  <img src="https://github.com/Arangluv/togetercoding/assets/90511789/b0a070c2-264d-4249-8fd3-ffb4649a9174">
+</p>
+
+- 같이 코딩 사이트의 메인페이지 입니다
+
+
+- 사이트를 설명해주는 텍스트는 빠른 개발을 위해 타 강의의 설명을 가져왔습니다 (배포 시 수정)
+
+  <br/>
+  <br/>
+### 로그인
+|로그인|이메일인증|
 |---|---|
-|![image](https://user-images.githubusercontent.com/66003567/216816017-bfd18669-9f70-45c2-8561-bae648690602.png)|![image](https://user-images.githubusercontent.com/66003567/216815971-d8ed6ea8-1f92-45f8-9611-1cbe2b5e8db0.png)|
-### 퀴즈 만들기
-<p align="center">
-  <img src="https://github.com/Arangluv/AQUIZ-Project/assets/90511789/2093c0e8-1b6a-48b3-bdd7-02da59203822">
-</p>
-<p align="center">
-  <img src="https://github.com/Arangluv/AQUIZ-Project/assets/90511789/c7377813-bff4-4fd5-ba80-30d35e39d563">
-</p>
-
-- 퀴즈 제목, 설명과 같은 부가정보를 입력할 수 있으며, 파일추가를 통해 썸네일 및 퀴즈 이미지를 등록할 수 있습니다
+|![image](https://github.com/Arangluv/togetercoding/assets/90511789/8be3aec1-10a4-4090-8a92-f9daf0cdb900)|![image](https://github.com/Arangluv/togetercoding/assets/90511789/c5447138-7159-49b4-ab51-e22465c6a385)|
+- 비밀번호를 입력하지 않고 가입한 이메일을 입력하면 유효성을 검사 후 해당 메일로 인증링크를 발송합니다
 
 
-- 다음 질문 만들기, 퀴즈 삭제하기를 통해 문제를 자유롭게 추가할 수 있습니다
-
-
-- **필수 항목을 만족하지 않고 퀴즈를 제출하는 경우** 모달창을 통해 사용자에게 알려주게 되며, 문제가 되는 곳을 클릭시 해당 파트로 이동시킵니다.
-
-- 등록된 퀴즈는 모든 이용자에게 공개됩니다
-  <br/>
-  <br/>
-### 퀴즈 수정하기
-<p align="center">
-  <img src="https://github.com/Arangluv/AQUIZ-Project/assets/90511789/bbefbb84-419b-4d19-a90e-3d2bb0c072a3">
-</p>
-
-- 자유롭게 퀴즈의 정답, 제목, 이미지를 수정할 수 있습니다.
-
-- 퀴즈가 수정되면 정답률은 초기화 됩니다
-  <br/>
-  <br/>
-
-### 퀴즈 풀기
-<p align="center">
-  <img src="https://github.com/Arangluv/AQUIZ-Project/assets/90511789/a8599a98-1139-4a77-9e30-0c28efb3f8d4">
-</p>
-<p align="center">
-  <img src="https://github.com/Arangluv/AQUIZ-Project/assets/90511789/ed4ca7f1-1653-4fe7-b510-01c178a6dec1">
-</p>
-
-- **문제를 풀지 않은 경우** 문제화면으로 이동하여 퀴즈를 풀 수 있습니다
-
-
-- **이미 문제를 푼 경우** 이전에 푼 기록을 불러와 정답화면으로 이동시킵니다
+- 사용자가 **5분안에 링크를 클릭**하면 로그인이 진행됩니다
 
   <br/>
   <br/>
+### 회원가입
+|회원가입|이메일인증|
+|---|---|
+|![image](https://github.com/Arangluv/togetercoding/assets/90511789/2aac7296-b6fe-4883-acf1-538d95f30135)|![image](https://github.com/Arangluv/togetercoding/assets/90511789/96e8eff2-00fd-4227-80a5-afe2556084bb)|
+- 비밀번호를 입력하지 않고 가입한 이메일을 입력하면 유효성을 검사 후 해당 메일로 인증링크를 발송합니다
+
+
+- 사용자가 **5분안에 링크를 클릭**하면 회원가입이 진행됩니다
+
+- 링크를 누르지않고, 로그인을 진행 시 다시 인증링크를 발송합니다
   
+  <br/>
+  <br/>
+### 카카오톡 로그인 / 회원가입
+<p align="center">
+  <img src="https://github.com/Arangluv/togetercoding/assets/90511789/da697f08-5f41-49f6-b9b8-d2a3c79ecb78">
+</p>
 
+- OAuth 2.0 기반의 소셜 로그인 서비스
+
+
+- 회원가입이 되어있지 않은 상태에서 카카오톡 로그인 버튼을 누르면 회원가입을 진행 후 로그인 시킵니다
+
+  <br/>
+  <br/>
+
+### 대쉬보드
+|전체|프로필사진이 있는 경우|
+|---|---|
+|![image](https://github.com/Arangluv/togetercoding/assets/90511789/f2017d4f-3e5a-4639-a65d-8b1b93c26686)|![image](https://github.com/Arangluv/togetercoding/assets/90511789/c8eca0d2-2f6f-4db5-af0c-824019dfe3c0)|
+
+- 수강생들의 대쉬보드 화면으로 듣고있는 강의, 노트, 이슈, 구매내역, 프로필을 확인할 수 있습니다.
+
+- 카카오톡 로그인 시 프로필사진이 있는 경우 자동으로 반영됩니다
+
+  <br/>
+  <br/>
+
+### ADMIN PAGE
+|메인화면|코스만들기|
+|---|---|
+|![image](https://github.com/Arangluv/togetercoding/assets/90511789/43fb9795-901d-4afb-8bc9-ce2e4df15e0f)|![image](https://github.com/Arangluv/togetercoding/assets/90511789/e2148017-9320-47bf-9dff-98a914c2074e)|
+
+|강의 대주제 만들기|강의 소주제 만들기|
+|---|---|
+|![image](https://github.com/Arangluv/togetercoding/assets/90511789/bbff2918-cc36-4641-a7f7-d90b7a4aa194)|![image](https://github.com/Arangluv/togetercoding/assets/90511789/16e4ffd1-0e4c-451f-bd6b-96a58fdd5b3a)|
+
+|소주제 수정|만든강의 불러오기|
+|---|---|
+|![image](https://github.com/Arangluv/togetercoding/assets/90511789/45b87170-7884-4009-8acc-598e45399091)|![image](https://github.com/Arangluv/togetercoding/assets/90511789/92ef3822-c513-49f2-b1e0-3cab87740f55)|
+
+- admin 페이지에 접속하면 서버의 환경변수에 저장되어 있는 값과 로그인 정보를 비교하여 page를 렌더링합니다. 기본적으로 null을 return합니다
+
+- 코스 제목, 설명, 가격, 썸네일 등을 입력하여 강의를 만들 수 있습니다
+
+- 강의 대 / 소주제 만들기는 강의 목차와 세부적인 정보들을 생성할 수 있게합니다. github 주소를 입력 시 수강생들 화면에는 별도로 github url 버튼을 rendering합니다
+
+- 강의 소주제에 대한 내용을 수정 및 삭제할 수 있습니다. 동영상을 수정 시 기존 AWS S3에 저장되어 있는 컨텐츠는 삭제합니다. 
+
+- 만든 강의는 전체강의에 보여집니다
+
+<br/>
+<br/>
+  
+### 강의보기
+|메인화면|코스만들기|
+|---|---|
+|![image](https://github.com/Arangluv/togetercoding/assets/90511789/43fb9795-901d-4afb-8bc9-ce2e4df15e0f)|![image](https://github.com/Arangluv/togetercoding/assets/90511789/e2148017-9320-47bf-9dff-98a914c2074e)|
+
+|메인화면|코스만들기|asd|
+|---|---|---|
+|![image](https://github.com/Arangluv/togetercoding/assets/90511789/43fb9795-901d-4afb-8bc9-ce2e4df15e0f)|![image](https://github.com/Arangluv/togetercoding/assets/90511789/e2148017-9320-47bf-9dff-98a914c2074e)|![image](https://github.com/Arangluv/togetercoding/assets/90511789/e2148017-9320-47bf-9dff-98a914c2074e)|
+
+- admin 페이지에 접속하면 서버의 환경변수에 저장되어 있는 값과 로그인 정보를 비교하여 page를 렌더링합니다. 기본적으로 null을 return합니다
+
+- 코스 제목, 설명, 가격, 썸네일 등을 입력하여 강의를 만들 수 있습니다
+
+- 강의 대 / 소주제 만들기는 강의 목차와 세부적인 정보들을 생성할 수 있게합니다. github 주소를 입력 시 수강생들 화면에는 별도로 github url 버튼을 rendering합니다
+
+- 강의 소주제에 대한 내용을 수정 및 삭제할 수 있습니다. 동영상을 수정 시 기존 AWS S3에 저장되어 있는 컨텐츠는 삭제합니다. 
+
+- 만든 강의는 전체강의에 보여집니다
+
+<br/>
+<br/>
   
