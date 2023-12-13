@@ -1,3 +1,4 @@
+
 ## 프로젝트 주제 : 같이코딩 - 강의사이트
 ![같이코딩 임시로고](https://github.com/Arangluv/togetercoding/assets/90511789/fb369f1b-857c-4ed0-8f05-a49703fa38ea)
 <br />
@@ -99,24 +100,53 @@
 <br/>
   
 ### 강의보기
-|메인화면|코스만들기|
+|메인페이지|강의세부내용|
 |---|---|
-|![image](https://github.com/Arangluv/togetercoding/assets/90511789/43fb9795-901d-4afb-8bc9-ce2e4df15e0f)|![image](https://github.com/Arangluv/togetercoding/assets/90511789/e2148017-9320-47bf-9dff-98a914c2074e)|
+|![image](https://github.com/Arangluv/togetercoding/assets/90511789/f3831ae1-e7c7-423b-9b8c-d76f8402c01e)|![image](https://github.com/Arangluv/togetercoding/assets/90511789/31607ef7-a03d-43c8-90bd-5c15c6b8c4f2)|
 
-|메인화면|코스만들기|asd|
-|---|---|---|
-|![image](https://github.com/Arangluv/togetercoding/assets/90511789/43fb9795-901d-4afb-8bc9-ce2e4df15e0f)|![image](https://github.com/Arangluv/togetercoding/assets/90511789/e2148017-9320-47bf-9dff-98a914c2074e)|![image](https://github.com/Arangluv/togetercoding/assets/90511789/e2148017-9320-47bf-9dff-98a914c2074e)|
+|결제를 이미 한경우|최초결제인 경우|
+|---|---|
+|![image](https://github.com/Arangluv/togetercoding/assets/90511789/044181be-3996-45c6-88aa-e9b8b36a8c42)|![image](https://github.com/Arangluv/togetercoding/assets/90511789/1900c275-ce69-494d-b261-6e03d08a9d0e)|
 
-- admin 페이지에 접속하면 서버의 환경변수에 저장되어 있는 값과 로그인 정보를 비교하여 page를 렌더링합니다. 기본적으로 null을 return합니다
+<p align="center">
+  <img src="https://github.com/Arangluv/togetercoding/assets/90511789/4cb13711-1d3a-4363-bc9f-479d00a1fca4">
+</p>
 
-- 코스 제목, 설명, 가격, 썸네일 등을 입력하여 강의를 만들 수 있습니다
+- guest는 강의목록을 list와 table형식으로 볼 수 있습니다
 
-- 강의 대 / 소주제 만들기는 강의 목차와 세부적인 정보들을 생성할 수 있게합니다. github 주소를 입력 시 수강생들 화면에는 별도로 github url 버튼을 rendering합니다
+- 강의 소개 세부페이지는 강의 별로 설명 해야하는 특징과 UI가 다를거라고 생각하여 한개의 컴포넌트로 추상화하지 않았습니다. 단 커리큘럼, 강의 제목을 불러오는 컴포넌트는 따로 추상화 작업이 필요합니다
 
-- 강의 소주제에 대한 내용을 수정 및 삭제할 수 있습니다. 동영상을 수정 시 기존 AWS S3에 저장되어 있는 컨텐츠는 삭제합니다. 
-
-- 만든 강의는 전체강의에 보여집니다
-
-<br/>
-<br/>
+- 결제를 이미 한 상태에서 수강버튼을 누르면 해당 강의 페이지로 routing 됩니다
   
+- 최초 수강인 경우 결제페이지로 넘어갑니다. 결제는 toss payment widget을 사용했습니다
+
+<br/>
+<br/>
+
+### 수강 및 관리하기
+|동영상 수강|코멘트 / 노트적기|
+|---|---|
+|![image](https://github.com/Arangluv/togetercoding/assets/90511789/2beeab6b-e1c0-4b6d-98f8-cf89aec93a4c)|![image](https://github.com/Arangluv/togetercoding/assets/90511789/1e897c31-98a2-49bc-a2e2-3ec263993c92)|
+
+|이슈 생성하기|수강활동 대쉬보드 확인|
+|---|---|
+|![image](https://github.com/Arangluv/togetercoding/assets/90511789/2b429bb6-4824-44af-bee7-5bb66ff106b0)|![image](https://github.com/Arangluv/togetercoding/assets/90511789/002e99a0-3113-49cd-b7ef-38d509ccbe52)|
+
+|이슈 확인|이슈 답변|
+|---|---|
+|![image](https://github.com/Arangluv/togetercoding/assets/90511789/771bf997-d9de-4e5a-9a15-90e64d3b8601)|![image](https://github.com/Arangluv/togetercoding/assets/90511789/32c8274f-b08b-45e8-95ea-0dc6b483cbe0)|
+
+|답변 확인|대댓글 달기|
+|---|---|
+|![image](https://github.com/Arangluv/togetercoding/assets/90511789/02ff6579-9762-403f-a2c0-1639cde30772)|![image](https://github.com/Arangluv/togetercoding/assets/90511789/928a8fb1-3cfd-4836-9ce0-ab9a6c03c03e)|
+
+- guest는 강의목록을 list와 table형식으로 볼 수 있습니다
+
+- 강의 소개 세부페이지는 강의 별로 설명 해야하는 특징과 UI가 다를거라고 생각하여 한개의 컴포넌트로 추상화하지 않았습니다. 단 커리큘럼, 강의 제목을 불러오는 컴포넌트는 따로 추상화 작업이 필요합니다
+
+- 결제를 이미 한 상태에서 수강버튼을 누르면 해당 강의 페이지로 routing 됩니다
+  
+- 최초 수강인 경우 결제페이지로 넘어갑니다. 결제는 toss payment widget을 사용했습니다
+
+<br/>
+<br/>
